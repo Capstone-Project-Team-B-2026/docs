@@ -6,7 +6,14 @@ title: Introduction
 
 # Nexus Ops
 
-Dokumentasi Capstone Project 50 Team B 2026.
+Dokumentasi Capstone Project 50 Team B 2026 — **Aplikasi Absensi Divisi Operation**.
+
+## Dokumen utama
+
+| Dokumen | Status | Deskripsi |
+|---------|--------|-----------|
+| [Product Requirements Document (PRD)](./prd) | Draft | Kebutuhan produk, scope, user stories, acceptance criteria |
+| [Infrastructure Document](./infrastructure) | Draft | Arsitektur sistem, lingkungan, keamanan, deployment |
 
 ## Cara menambah halaman
 
