@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { font-family: Inter, system-ui, sans-serif; padding: 16px; margin: 0; background: #F4F7FA; }
+  h2 { font-size: 14px; margin: 0 0 8px; color: #072A42; }
+  p { font-size: 12px; color: #374151; margin: 0 0 14px; line-height: 1.4; }
+  button {
+    width: 100%; padding: 10px; border: none; border-radius: 10px;
+    background: #0B3A5C; color: white; font-size: 13px; font-weight: 600;
+    cursor: pointer; margin-bottom: 8px;
+  }
+  button:hover { background: #072A42; }
+  button.secondary { background: #E8F2F8; color: #072A42; }
+  button.secondary:hover { background: #D4E6F2; }
+  #status { font-size: 11px; color: #6B7280; margin-top: 8px; min-height: 40px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+  <h2>Nexus Ops Design Generator</h2>
+  <p>Generate layar M-* / W-* dari docs (design-system, screens, PRD).</p>
+
+  <button data-scope="all">Generate Everything</button>
+  <button class="secondary" data-scope="tokens">Tokens + Metrics Board</button>
+  <button class="secondary" data-scope="mobile">Mobile Screens (M-*)</button>
+  <button class="secondary" data-scope="web">Web Pages (W-*)</button>
+  <button class="secondary" data-scope="components">All Screens + Tokens</button>
+
+  <div id="status">Ready.</div>
+
+  <script>
+    var statusEl = document.getElementById('status');
+    function setStatus(text) { statusEl.textContent = text; }
+    function generate(scope) {
+      setStatus('Sending: ' + scope + '…');
+      parent.postMessage({ pluginMessage: { type: 'generate', scope: scope } }, '*');
+    }
+    var buttons = document.querySelectorAll('button[data-scope]');
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].addEventListener('click', function (e) {
+        generate(e.currentTarget.getAttribute('data-scope'));
+      });
+    }
+    window.onmessage = function (event) {
+      var msg = event.data && event.data.pluginMessage;
+      if (msg && msg.status) setStatus(msg.status);
+    };
+  </script>
+</body>
+</html>

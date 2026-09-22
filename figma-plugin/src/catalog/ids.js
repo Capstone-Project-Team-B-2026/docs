@@ -1,0 +1,53 @@
+/** Mobile M-* from screens.md §2 */
+export const MOBILE_SCREENS = [
+  ['M-A01', 'Splash & cek sesi', 'auth'],
+  ['M-A02', 'Masuk', 'auth'],
+  ['M-A03', 'Sesi berakhir', 'auth'],
+  ['M-H01', 'Beranda', 'home'],
+  ['M-H02', 'Detail shift', 'home'],
+  ['M-ATT01', 'Hub absensi', 'attendance'],
+  ['M-ATT02', 'Capture wajah', 'attendance'],
+  ['M-ATT03', 'Validasi lokasi', 'attendance'],
+  ['M-ATT04', 'Absensi berhasil', 'attendance'],
+  ['M-ATT05', 'Gagal — wajah', 'attendance'],
+  ['M-ATT06', 'Gagal — GPS', 'attendance'],
+  ['M-ATT07', 'Riwayat absensi', 'attendance'],
+  ['M-ATT08', 'Detail catatan', 'attendance'],
+  ['M-LV01', 'Daftar izin/cuti', 'leave'],
+  ['M-LV02', 'Form ajukan izin', 'leave'],
+  ['M-LV03', 'Detail pengajuan', 'leave'],
+  ['M-LV04', 'Pengajuan terkirim', 'leave'],
+  ['M-OT01', 'Daftar lembur', 'overtime'],
+  ['M-OT02', 'Form lembur', 'overtime'],
+  ['M-OT03', 'Detail lembur', 'overtime'],
+  ['M-N01', 'Pusat notifikasi', 'notification'],
+  ['M-N02', 'Preferensi notifikasi', 'notification'],
+  ['M-P01', 'Profil saya', 'profile'],
+  ['M-P02', 'Pengaturan', 'settings'],
+  ['M-P03', 'Enrollment wajah', 'profile'],
+  ['M-P04', 'Bantuan', 'support'],
+];
+
+/** Web W-* from screens.md §3 */
+export const WEB_SCREENS = [
+  ['W-A01', 'Masuk dashboard', 'auth'],
+  ['W-D01', 'Ringkasan operasional', 'dashboard'],
+  ['W-D02', 'Kehadiran live', 'dashboard'],
+  ['W-AP01', 'Inbox persetujuan', 'approval'],
+  ['W-AP02', 'Detail izin/cuti', 'approval'],
+  ['W-AP03', 'Detail lembur', 'approval'],
+  ['W-T01', 'Daftar kehadiran', 'team'],
+  ['W-T02', 'Detail karyawan', 'team'],
+  ['W-R01', 'Hub laporan', 'report'],
+  ['W-R02', 'Filter laporan', 'report'],
+  ['W-R03', 'Preview & unduh', 'report'],
+  ['W-H01', 'Manajemen pengguna', 'hrd'],
+  ['W-H02', 'Form pengguna', 'hrd'],
+  ['W-H03', 'Lokasi & geofence', 'hrd'],
+  ['W-H04', 'Form lokasi', 'hrd'],
+  ['W-H05', 'Log audit', 'hrd'],
+  ['W-S01', 'Pengaturan organisasi', 'settings'],
+  ['W-S02', 'Notifikasi sistem', 'settings'],
+];
+
+export const ALL_SCREEN_IDS = [...MOBILE_SCREENS, ...WEB_SCREENS].map((r) => r[0]);

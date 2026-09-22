@@ -1,0 +1,13 @@
+{
+  "name": "nexus-ops-figma-plugin",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --outfile=code.js --format=iife --target=es2017 --banner:js='/* generated from src/ — do not edit */'",
+    "watch": "esbuild src/main.js --bundle --outfile=code.js --format=iife --target=es2017 --watch --banner:js='/* generated from src/ — do not edit */'",
+    "audit": "node scripts/audit-coverage.js",
+    "test": "npm run build && npm run audit"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

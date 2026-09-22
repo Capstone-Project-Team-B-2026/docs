@@ -14,6 +14,12 @@ Dokumentasi Capstone Project 50 Team B 2026 — **Aplikasi Absensi Divisi Operat
 |---------|--------|-----------|
 | [Product Requirements Document (PRD)](./prd) | Draft | Kebutuhan produk, scope, user stories, acceptance criteria |
 | [Infrastructure Document](./infrastructure) | Draft | Arsitektur sistem, lingkungan, keamanan, deployment |
+| [Design System](./design-system) | Draft | Token warna, tipografi, komponen, pola UI |
+| [Screens & Pages](./screens) | Draft | Inventaris layar mobile (M-*) & web (W-*) |
+
+## Desain di Figma
+
+Generator layar MVP ada di folder `figma-plugin/` (plugin development lokal). Build dengan `npm run build`, lalu load `manifest.json` di Figma → Plugins → Development.
 
 ## Cara menambah halaman
 

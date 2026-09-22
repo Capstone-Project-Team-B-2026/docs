@@ -334,4 +334,6 @@ MVP dianggap selesai bila:
 
 - Proposal Capstone Project — Pengembangan Aplikasi Absensi Divisi Operation (Kelompok B, 2026)
 - [Infrastructure Document (Draft)](./infrastructure)
+- [Design System](./design-system)
+- [Screens & Pages](./screens)
 - [Introduction](./)
