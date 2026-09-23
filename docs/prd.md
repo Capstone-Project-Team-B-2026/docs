@@ -12,7 +12,7 @@ title: Product Requirements Document (PRD)
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.1.1 (Draft) |
+| Version | 0.1.2 (Draft) |
 | Mata Kuliah | STSI4440 |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
 | Last updated | 2026-09-23 |
@@ -262,18 +262,18 @@ flowchart LR
 
 ## 9. Milestone & jadwal (dari proposal)
 
-| Minggu | Fokus | Artefak terkait PRD |
-|--------|-------|---------------------|
-| 1 | Analisis kebutuhan, wawancara, requirement | PRD v0.2 (setelah feedback) |
-| 2 | Arsitektur, DB, UI/UX Figma | Spec teknis + wireframe |
-| 3–4 | Backend API + face recognition + geofencing | ATT/LV API ready |
-| 4–5 | Mobile: clock-in/out, izin/cuti, lembur | Build Android MVP |
-| 5–6 | Web dashboard + pelaporan | Dashboard + export |
-| 6 | Integrasi & integration testing | Test report |
-| 7 | UAT Divisi Operation | UAT sign-off |
-| 8 | Perbaikan, deploy, evaluasi, laporan akhir | Release + laporan |
+Sprint board = **1 minggu × 8** (S1…S8). Detail & Gantt: [SDLC §4](./sdlc).
 
-Metodologi: Waterfall untuk kerangka tahapan, **Agile Scrum (sprint 2 minggu)** pada fase pengembangan.
+| Sprint | Minggu | Fokus | Artefak terkait PRD |
+|--------|--------|-------|---------------------|
+| S1 | 1 | Analisis kebutuhan, wawancara, requirement | PRD v0.2 (setelah feedback) |
+| S2 | 2 | Desain + **kickoff paralel** BE & UI | Spec teknis + wireframe; OpenAPI awal |
+| S3–S5 | 3–5 | **Build paralel** BE + mobile + web (utamanya P0) | Increment API + UI demoable |
+| S6 | 6 | Parallel lanjut + integrasi (P1) | Test report awal |
+| S7 | 7 | Parallel polish (P2) + mulai UAT | UAT checklist berjalan |
+| S8 | 8 | UAT selesai, deploy, evaluasi, laporan | Release + laporan |
+
+Metodologi: Waterfall untuk kerangka tahapan, **Agile Scrum (sprint 1 minggu)**; **backend dan UI dikerjakan paralel** sejak S2 (bukan antrian BE → mobile → web).
 
 ---
 
@@ -329,6 +329,7 @@ MVP dianggap selesai bila:
 |-------|---------|-----------|
 | 0.1.0 | 2026-09-22 | Draft awal dari proposal capstone Kelompok B |
 | 0.1.1 | 2026-09-23 | Dependensi backend diselaraskan ke stack aktual (Infra v0.2) |
+| 0.1.2 | 2026-09-24 | Milestone sprint 1 minggu; BE∥UI paralel sejak S2 |
 
 ---
 

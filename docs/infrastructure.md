@@ -12,7 +12,7 @@ title: Infrastructure Document
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.2.0 (Draft) |
+| Version | 0.2.1 (Draft) |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
 | Last updated | 2026-09-23 |
 
@@ -444,14 +444,16 @@ Neon + Workers cocok untuk spike ringan; laporan berat dapat diantrikan (P1) jik
 
 ## 11. Rencana implementasi infrastruktur
 
-| Minggu | Aktivitas |
+Selaras [SDLC §4](./sdlc) (sprint 1 minggu; **BE ∥ UI** sejak S2).
+
+| Sprint | Aktivitas |
 |--------|-----------|
-| 1 | Inventaris NFR; draft env & secret policy |
-| 2 | **Done (backend):** stack API, Neon, Workers bootstrap, OpenAPI, CI coverage |
-| 3–4 | Attendance + face + geofence API; storage & FCM spike |
-| 4–6 | CI mobile/web; harden development Worker |
-| 6–7 | Integrasi & UAT terhadap API development/production |
-| 8 | Production tag release, backup check, evaluasi, dokumentasi final |
+| S1 | Inventaris NFR; draft env & secret policy |
+| S2 | Stack API, Neon, Workers bootstrap, OpenAPI, CI; kickoff kontrak untuk mobile/web |
+| S3–S5 | Attendance + face + geofence API **paralel** dengan UI; storage & FCM spike |
+| S5–S6 | CI mobile/web; harden development Worker; wiring API |
+| S7 | Integrasi & mulai UAT terhadap API development/production |
+| S8 | Production tag release, backup check, evaluasi, dokumentasi final |
 
 ---
 
@@ -474,6 +476,7 @@ Neon + Workers cocok untuk spike ringan; laporan berat dapat diantrikan (P1) jik
 |-------|---------|-----------|
 | 0.1.0 | 2026-09-22 | Draft awal dari proposal capstone Kelompok B |
 | 0.2.0 | 2026-09-23 | Selaraskan dengan backend aktual: Bun/Hono/Drizzle/Neon/Workers, CI, JWT, env trunk-based |
+| 0.2.1 | 2026-09-24 | Rencana infra per sprint 1 minggu; BE∥UI paralel S2–S7 |
 
 ---
 

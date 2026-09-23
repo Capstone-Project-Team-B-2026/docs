@@ -12,7 +12,7 @@ title: Software Development Life Cycle (SDLC)
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.1.0 (Draft) |
+| Version | 0.1.1 (Draft) |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
 | Last updated | 2026-09-23 |
 
@@ -37,20 +37,21 @@ Nexus Ops memakai **hybrid**:
 | Lapisan | Pendekatan | Alasan |
 |---------|------------|--------|
 | Kerangka proyek | **Waterfall** (fase berurutan 8 minggu) | Jadwal capstone tetap: analisis → desain → build → UAT → laporan |
-| Fase pengembangan | **Agile Scrum** (sprint **2 minggu**) | Iterasi fitur, feedback cepat, prioritas backlog fleksibel |
+| Fase pengembangan | **Agile Scrum** (sprint **1 minggu** × 8) | Ritme ketat; **backend + UI paralel** sejak Minggu 2 |
 
 ```mermaid
 flowchart LR
   subgraph Waterfall["Kerangka Waterfall"]
-    A[Analisis] --> D[Desain]
-    D --> B[Build & Integrasi]
-    B --> U[UAT]
-    U --> R[Release & Evaluasi]
+    A[Analisis M1] --> D[Desain + kickoff M2]
+    D --> B[Build paralel M2–M7]
+    B --> U[UAT M7–M8]
+    U --> R[Release M8]
   end
 
-  subgraph Scrum["Di dalam Build"]
-    S1[Sprint 1] --> S2[Sprint 2]
-    S2 --> S3[Sprint 3+]
+  subgraph Scrum["Sprint 1 minggu"]
+    S1[S1] --> S2[S2]
+    S2 --> S3[S3…S7]
+    S3 --> S8[S8]
   end
 
   B -.-> Scrum
@@ -59,8 +60,10 @@ flowchart LR
 Prinsip kerja:
 
 - Requirement dikunci bertahap (PRD draft → PRD setelah wawancara Minggu 1).
-- Setiap sprint menghasilkan increment yang bisa di-demo (API / mobile / web sesuai fokus sprint).
+- **Paralel:** backend API, mobile UI, dan web UI dikerjakan bersamaan (Minggu 2–7), bukan antrian BE → mobile → web.
+- Setiap sprint menghasilkan increment yang bisa di-demo (API dan/atau UI).
 - Scope creep ditahan lewat Definition of Done + batasan MVP di PRD.
+- Board GitHub Project: filter **This Sprint** = `sprint:@current -status:Icebox`; view **All** diurutkan by Sprint.
 
 ---
 
@@ -124,56 +127,54 @@ Mobile & web: build CI + distribusi internal; store track mengikuti kesiapan MVP
 
 ---
 
-## 4. Jadwal & mapping fase ↔ minggu
+## 4. Jadwal & mapping fase ↔ sprint (1 minggu)
 
-Diselaraskan dengan milestone PRD:
+Diselaraskan dengan milestone PRD. **Satu minggu = satu sprint** di GitHub Project (`Sprint` field).
 
-| Minggu | Fase SDLC | Fokus | Artefak |
-|--------|-----------|-------|---------|
-| 1 | Analisis | Wawancara, requirement | PRD v0.2 |
-| 2 | Desain | Arsitektur, DB, Figma | Infra + wireframe + screens |
-| 3–4 | Build (Sprint) | Backend API + face + geofencing | ATT/LV API |
-| 4–5 | Build (Sprint) | Mobile clock-in/out, leave, OT | APK Android MVP |
-| 5–6 | Build (Sprint) | Web dashboard + laporan | Dashboard + export |
-| 6 | Testing | Integrasi end-to-end | Test report |
-| 7 | UAT | Validasi Divisi Operation | UAT sign-off |
-| 8 | Release & evaluasi | Perbaikan, deploy, laporan | Tag release + laporan akhir |
+| Sprint | Tanggal (dari) | Fase | Fokus (paralel di M2–M7) | Artefak |
+|--------|----------------|------|--------------------------|---------|
+| **S1** | 2026-09-22 | Analisis | Wawancara, requirement | PRD v0.2 |
+| **S2** | 2026-09-29 | Kickoff paralel | Auth/shell mobile + web; kontrak API | Login/home/dashboard skeleton |
+| **S3** | 2026-10-06 | Build paralel | Attendance (face/GPS) + Approvals | Clock-in + inbox approve |
+| **S4** | 2026-10-13 | Build paralel | Leave/OT + Reports | Pengajuan + ekspor |
+| **S5** | 2026-10-20 | Build paralel | Profile/notif + HRD users | Enrollment + kelola akun |
+| **S6** | 2026-10-27 | Build + integrasi | Riwayat/history + geofence master | P1 lists & lokasi |
+| **S7** | 2026-11-03 | Polish + UAT start | Settings/P2 + mulai UAT | UAT checklist berjalan |
+| **S8** | 2026-11-10 | UAT & Release | Perbaikan UAT, deploy, laporan | Tag release + laporan akhir |
+
+**Urutan layar (board):** bergantung alur Figma (auth → absensi → leave/OT → profil; web: auth → dashboard → approval → laporan → HRD). UI + API layar yang sama satu sprint. Roadmap: [Project view Roadmap](https://github.com/orgs/Capstone-Project-Team-B-2026/projects/2/views/3) (`has:sprint -status:Done`; Group by **Group** untuk swimlane).
 
 ```mermaid
 gantt
-  title Nexus Ops — timeline capstone (draft)
+  title Nexus Ops — sprint 1 minggu (paralel BE + UI)
   dateFormat  YYYY-MM-DD
   axisFormat  %d/%m
 
-  section Analisis
-  Wawancara & PRD           :a1, 2026-09-22, 7d
+  section S1 Analisis
+  Wawancara & PRD                :a1, 2026-09-22, 7d
 
-  section Desain
-  Arsitektur & UI           :d1, after a1, 7d
+  section S2–S7 Parallel
+  Backend API                    :b1, 2026-09-29, 42d
+  Mobile UI / MVP                :m1, 2026-09-29, 42d
+  Web dashboard                  :w1, 2026-09-29, 42d
 
-  section Build
-  Backend API               :b1, after d1, 14d
-  Mobile MVP                :b2, after b1, 14d
-  Web dashboard             :b3, after b1, 21d
-
-  section Validasi
-  Integrasi & test          :t1, after b2, 7d
-  UAT                       :t2, after t1, 7d
-  Release & laporan         :r1, after t2, 7d
+  section S7–S8 Validasi
+  Integrasi & UAT                :t1, 2026-11-03, 14d
+  Release & laporan              :r1, 2026-11-10, 7d
 ```
 
-*Tanggal absolut di Gantt bersifat ilustratif; acuan utama adalah kolom **Minggu** di tabel di atas.*
+*Tanggal absolut mengikuti kickoff 2026-09-22; sesuaikan jika jadwal kelas bergeser.*
 
 ---
 
-## 5. Scrum dalam fase build
+## 5. Scrum (sprint 1 minggu)
 
 ### 5.1 Ritme
 
 | Event | Frekuensi | Tujuan |
 |-------|-----------|--------|
-| Sprint | 2 minggu | Increment terencana |
-| Sprint planning | Awal sprint | Pilih backlog dari PRD / open issues |
+| Sprint | **1 minggu** (S1…S8) | Increment terencana; BE ∥ mobile ∥ web |
+| Sprint planning | Awal sprint | Ambil issue `sprint:@current` (bukan Icebox) |
 | Daily sync | Singkat (async/sync) | Blocking & handoff backend ↔ mobile ↔ web |
 | Sprint review | Akhir sprint | Demo ke tim / stakeholder jika tersedia |
 | Retro | Akhir sprint | Perbaiki proses (bukan hanya kode) |
@@ -276,6 +277,7 @@ Risiko produk (akurasi wajah, GPS, dll.) tetap di [PRD §11](./prd).
 | Versi | Tanggal | Perubahan |
 |-------|---------|-----------|
 | 0.1.0 | 2026-09-23 | Draft awal SDLC hybrid Waterfall + Scrum, selaras PRD & infra backend |
+| 0.1.1 | 2026-09-24 | Sprint 1 minggu × 8; build BE∥UI paralel S2–S7; board filter This Sprint |
 
 ---
 
