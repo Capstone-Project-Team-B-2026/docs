@@ -13,9 +13,24 @@ Dokumentasi Capstone Project 50 Team B 2026 — **Aplikasi Absensi Divisi Operat
 | Dokumen | Status | Deskripsi |
 |---------|--------|-----------|
 | [Product Requirements Document (PRD)](./prd) | Draft | Kebutuhan produk, scope, user stories, acceptance criteria |
-| [Infrastructure Document](./infrastructure) | Draft | Arsitektur sistem, lingkungan, keamanan, deployment |
+| [Software Development Life Cycle (SDLC)](./sdlc) | Draft | Proses hybrid Waterfall + Scrum, fase, DoD, release |
+| [Infrastructure Document](./infrastructure) | Draft v0.2 | Arsitektur & deploy — **backend terkunci** (Bun/Hono/Neon/Workers) |
 | [Design System](./design-system) | Draft | Token warna, tipografi, komponen, pola UI |
 | [Screens & Pages](./screens) | Draft | Inventaris layar mobile (M-*) & web (W-*) |
+
+## Backend (ringkas)
+
+Repo: [Capstone-Project-Team-B-2026/backend](https://github.com/Capstone-Project-Team-B-2026/backend)
+
+| Item | Nilai |
+|------|-------|
+| Stack | Bun · TypeScript · Hono · Zod→OpenAPI · Drizzle · Neon |
+| Deploy | Cloudflare Workers (trunk-based: `main` → dev, tag `v*` → prod) |
+| Auth | JWT · roles `employee` / `supervisor` / `hrd` |
+| Quality | ESLint · Prettier · Husky · CI coverage ≥ 95% |
+| OpenAPI | `/docs` pada Worker / `bun run dev` lokal |
+
+Detail: [Infrastructure Document](./infrastructure).
 
 ## Desain di Figma
 
