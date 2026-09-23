@@ -12,10 +12,10 @@ title: Product Requirements Document (PRD)
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.1.0 (Draft) |
+| Version | 0.1.1 (Draft) |
 | Mata Kuliah | STSI4440 |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
-| Last updated | 2026-09-22 |
+| Last updated | 2026-09-23 |
 
 ---
 
@@ -251,11 +251,12 @@ flowchart LR
 
 ### Dependensi
 
-- Library face recognition (mis. face-api.js / Python `face_recognition`)
+- **Backend (sudah dipilih):** Bun + Hono + Drizzle + Neon PostgreSQL + Cloudflare Workers — lihat [Infrastructure](./infrastructure)
+- Library face recognition (mis. face-api.js / Python `face_recognition`) — *TBD*
 - Geolocation API + konfigurasi geofencing
-- Firebase Cloud Messaging (atau setara) untuk push notification
-- Cloud storage (Firebase / AWS S3) untuk aset terkait absensi bila diperlukan
-- Infrastruktur deployment sesuai [Infrastructure Document](./infrastructure)
+- Firebase Cloud Messaging (atau setara) untuk push notification — *TBD*
+- Cloud storage (Firebase / R2 / S3) untuk aset terkait absensi — *TBD*
+- Infrastruktur deployment selengkapnya: [Infrastructure Document](./infrastructure)
 
 ---
 
@@ -306,7 +307,7 @@ MVP dianggap selesai bila:
 | Anggota | Peran |
 |---------|-------|
 | Atin Mulyanto | Project Leader & Analyst — requirement, koordinasi |
-| Akmal Syarifudin | Backend Developer — API, DB, face recognition, geofencing |
+| Akmal Syarifudin | Backend Developer & Infrastructure — API, DB, face recognition, geofencing, deployment, CI/CD |
 | Leonardus Sunu Kristianto | Mobile Developer — Android, kamera, GPS, notifikasi |
 | Asep Muhammad | UI/UX & Frontend — Figma, web dashboard admin |
 
@@ -327,6 +328,7 @@ MVP dianggap selesai bila:
 | Versi | Tanggal | Perubahan |
 |-------|---------|-----------|
 | 0.1.0 | 2026-09-22 | Draft awal dari proposal capstone Kelompok B |
+| 0.1.1 | 2026-09-23 | Dependensi backend diselaraskan ke stack aktual (Infra v0.2) |
 
 ---
 

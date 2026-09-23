@@ -6,21 +6,21 @@ title: Infrastructure Document
 # Infrastructure Document
 
 :::info Status
-**Draft** — disusun dari Proposal Capstone Project Kelompok B (STSI4440, 2026). Keputusan stack final (Node vs Python, Flutter vs RN, dsb.) masih terbuka sesuai tabel teknologi di proposal.
+**Draft (stack backend + klien terkunci)** — backend Bun/Hono/Neon/Workers; web Vue 3 + Orval + GH Pages; mobile Vue 3 + Capacitor + APK CI. Face/storage/push masih terbuka.
 :::
 
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.1.0 (Draft) |
+| Version | 0.2.0 (Draft) |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
-| Last updated | 2026-09-22 |
+| Last updated | 2026-09-23 |
 
 ---
 
 ## 1. Tujuan dokumen
 
-Dokumen ini mendeskripsikan **arsitektur infrastruktur draft** untuk Nexus Ops: komponen sistem, lingkungan (dev/staging/prod), penyimpanan data, keamanan, observabilitas, dan rencana deployment. Detail final akan dikunci pada fase System Design (Minggu 2).
+Dokumen ini mendeskripsikan arsitektur infrastruktur Nexus Ops: komponen sistem, lingkungan, penyimpanan data, keamanan, observabilitas, dan deployment. **Backend API sudah di-bootstrap** di repo terpisah; bagian klien & layanan pendukung (face, FCM, object storage) masih mengikuti rencana proposal.
 
 Dokumen terkait: [Product Requirements Document (PRD)](./prd)
 
@@ -30,20 +30,20 @@ Dokumen terkait: [Product Requirements Document (PRD)](./prd)
 
 Sistem terdiri dari tiga permukaan klien + backend API + layanan pendukung:
 
-| Lapisan | Komponen | Teknologi kandidat (dari proposal) |
-|---------|----------|-------------------------------------|
-| Mobile | Aplikasi absensi karyawan (Android) | Flutter **atau** React Native |
-| Web | Dashboard admin / supervisor / HRD | React.js **atau** Vue.js |
-| API | RESTful backend | Node.js (Express) **atau** Python (FastAPI) |
-| Data | Relational DB | PostgreSQL **atau** MySQL |
-| AI/CV | Face recognition service | face-api.js **atau** Python `face_recognition` |
+| Lapisan | Komponen | Teknologi |
+|---------|----------|-----------|
+| Mobile | Aplikasi absensi karyawan (Android) | **Vue 3 + Capacitor** |
+| Web | Dashboard admin / supervisor / HRD | **Vue 3 + Vite** |
+| **API** | RESTful backend | **Bun + TypeScript + Hono** · Zod→OpenAPI · DDD modules |
+| **Data** | Relational DB | **Neon (PostgreSQL)** · Drizzle ORM |
+| AI/CV | Face recognition service | face-api.js **atau** Python `face_recognition` *(TBD)* |
 | Lokasi | GPS + geofencing | Geolocation API (device) + validasi server |
-| Storage | Objek (foto enroll / bukti absensi) | Firebase Storage **atau** AWS S3 |
-| Push | Notifikasi | Firebase Cloud Messaging (FCM) |
-| Design | UI/UX | Figma |
-| VCS / PM | Kolaborasi | Git + GitHub · Trello / Jira |
+| Storage | Objek (foto enroll / bukti absensi) | Firebase Storage **atau** R2/S3 *(TBD)* |
+| Push | Notifikasi | Firebase Cloud Messaging (FCM) *(TBD)* |
+| Design | UI/UX | Figma (+ generator di `docs/figma-plugin`) |
+| VCS / CI | Kolaborasi & otomatisasi | GitHub · GitHub Actions |
 
-### Diagram konteks (draft)
+### Diagram konteks
 
 ```mermaid
 flowchart TB
@@ -52,27 +52,27 @@ flowchart TB
     W[Web Dashboard<br/>Admin / HRD]
   end
 
-  subgraph Backend
-    API[Backend API<br/>Auth · Absensi · Leave · OT · Reports]
+  subgraph Edge["Backend · Cloudflare Workers"]
+    API[Hono API<br/>Auth · Absensi · Leave · OT · Reports]
   end
 
-  subgraph Services
-    DB[(RDBMS)]
-    FR[Face Recognition]
-    OS[(Object Storage)]
-    FCM[FCM Push]
+  subgraph DataPlane
+    DB[(Neon PostgreSQL)]
+    FR[Face Recognition<br/>TBD]
+    OS[(Object Storage<br/>TBD)]
+    FCM[FCM Push<br/>TBD]
   end
 
   M -->|HTTPS / REST| API
   W -->|HTTPS / REST| API
   API --> DB
-  API --> FR
-  API --> OS
-  API --> FCM
+  API -.-> FR
+  API -.-> OS
+  API -.-> FCM
   FCM -.->|Push| M
 ```
 
-### Alur validasi absensi (server)
+### Alur validasi absensi (server) — target
 
 ```mermaid
 sequenceDiagram
@@ -80,7 +80,7 @@ sequenceDiagram
   participant App as Mobile App
   participant API as Backend API
   participant FR as Face Recognition
-  participant DB as RDBMS
+  participant DB as Neon
   participant Store as Object Storage
 
   K->>App: Clock-in
@@ -120,76 +120,124 @@ sequenceDiagram
 - Manajemen user & master data (HRD)
 - Generate / unduh laporan PDF & Excel
 
-### 3.3 Backend API
+### 3.3 Backend API *(implemented skeleton)*
 
-- Autentikasi & otorisasi (RBAC: Karyawan, Supervisor, HRD)
-- CRUD absensi, leave, overtime
-- Orkestrasi validasi wajah + geofence
-- Aggregate & export laporan
-- Integrasi FCM (kirim notifikasi)
+| Aspek | Keputusan |
+|-------|-----------|
+| Runtime lokal | Bun (`bun run dev`) |
+| Runtime produksi | **Cloudflare Workers** (`src/worker.ts` + Wrangler) |
+| Framework HTTP | **Hono** + `@hono/zod-openapi` |
+| OpenAPI | Auto dari Zod schemas → `/openapi.json` + UI `/docs` |
+| Auth | **JWT** (HS256, `jose`) · RBAC role: `employee` / `supervisor` / `hrd` |
+| Password | `bcryptjs` (kompatibel Workers; bukan `Bun.password` di path runtime) |
+| ORM | **Drizzle** |
+| DB driver Worker | `@neondatabase/serverless` (HTTP) |
+| DB driver migrate/seed | `postgres.js` (TCP ke Neon) |
+| Arsitektur | **Pure DDD** — `src/modules/<bounded_context>/<aggregate>/` |
+
+Modul saat ini:
+
+| Context | Aggregate | Status |
+|---------|-----------|--------|
+| `identity` | `user` | Login + `/v1/auth/me` |
+| `attendance` | `record` | Placeholder |
+| `leave` | `request` | Placeholder |
+| `overtime` | `request` | Placeholder |
+| `location` | `geofence` | Placeholder |
+
+Endpoint hidup: `GET /health`, `POST /v1/auth/login`, `GET /v1/auth/me`.
 
 ### 3.4 Face recognition
 
 - Enrollment wajah karyawan (template/embedding)
 - Verifikasi pada clock-in/out
 - Library siap pakai; **tidak** train model dari nol (sesuai batasan PRD)
-- Dapat dijalankan **in-process** di API atau sebagai **microservice** terpisah (keputusan Minggu 2)
+- Runtime (in-process vs service) masih **TBD**
 
 ### 3.5 GPS geofencing
 
 - Device mengirim koordinat saat absensi
-- Server memvalidasi titik berada dalam radius/polygon lokasi kerja yang dikonfigurasi
-- Menyimpan reason code jika ditolak (di luar area, GPS off, akurasi rendah)
+- Server memvalidasi titik berada dalam radius/polygon lokasi kerja
+- Menyimpan reason code jika ditolak (`OUT_OF_GEOFENCE`, akurasi rendah, dll.)
 
 ### 3.6 Object storage
 
 - Menyimpan foto enrollment / snapshot verifikasi (jika disimpan)
-- Akses terbatas (signed URL / private bucket)
+- Akses terbatas (signed URL / private bucket) — vendor **TBD**
 
 ### 3.7 Notifikasi
 
-- FCM untuk Android
+- FCM untuk Android *(wiring TBD)*
 - Event: status approval, pengingat absensi, deadline pengajuan
 
 ---
 
 ## 4. Lingkungan (environments)
 
-| Environment | Tujuan | Catatan draft |
-|-------------|--------|---------------|
-| **Local / Dev** | Pengembangan individu | Docker Compose untuk DB (+ optional MinIO/localstack) |
-| **Staging** | Integrasi & UAT | Mirror prod dalam skala kecil; data non-produksi |
-| **Production** | Operasional Divisi Operation | Akses terbatas; backup & monitoring aktif |
+Backend memakai **trunk-based** deploy, bukan staging container terpisah:
+
+| Environment | Tujuan | Runtime |
+|-------------|--------|---------|
+| **Local** | Pengembangan | Bun lokal + Neon (atau DB lokal opsional) |
+| **Development** | Integrasi / preview API | Cloudflare Worker `dev-nexus-ops-api` · Neon branch/DB **dev** |
+| **Production** | Demo / operasional | Cloudflare Worker `nexus-ops-api` · Neon branch/DB **prod** |
 
 ```mermaid
 flowchart LR
-  Dev[Local / Dev<br/>Docker Compose] --> Staging[Staging<br/>Integrasi & UAT]
-  Staging -->|Manual promote| Prod[Production<br/>Divisi Operation]
+  Local[Local Bun + Neon] --> Dev[CF Worker development<br/>push main]
+  Dev -->|git tag v*| Prod[CF Worker production]
 ```
+
+| Trigger | Cloudflare env | Worker name |
+|---------|----------------|-------------|
+| Push ke `main` | `development` | `dev-nexus-ops-api` |
+| Tag `v*` (mis. `v0.1.0`) | `production` | `nexus-ops-api` |
+
+Contoh URL publik (akun Cloudflare tim):
+
+- Dev: `https://dev-nexus-ops-api.dev-akmal69.workers.dev`
+- Prod: `https://nexus-ops-api.dev-akmal69.workers.dev`
 
 ### Naming & konfigurasi
 
-- Konfigurasi via environment variables (tidak hardcode secret)
-- Satu set variabel per environment: `DATABASE_URL`, `JWT_SECRET`, `S3_*` / `FIREBASE_*`, `FCM_*`, `GEOFENCE_DEFAULT_RADIUS`, dll.
+Secret / env (tidak di Git):
+
+| Variabel | Keterangan |
+|----------|------------|
+| `DATABASE_URL` | Neon connection string (per env) |
+| `JWT_SECRET` | Shared secret HS256 (min 16 karakter) |
+| `APP_URL` | Base URL publik Worker (per env) |
+| `APP_ENV` / `APP_NAME` / `JWT_EXPIRES_IN` / `CORS_ORIGINS` | Vars Wrangler (bukan secret) |
+
+Nanti: `FCM_*`, storage credentials, `GEOFENCE_DEFAULT_RADIUS`, dll.
 
 ---
 
 ## 5. Data & penyimpanan
 
-### 5.1 Database relasional (draft entities)
+### 5.1 Database — Neon PostgreSQL
+
+Provider: **Neon**. Schema dikelola Drizzle (`drizzle/` migrations).
+
+**Sudah ada di migrasi awal:**
+
+| Tabel | Catatan |
+|-------|---------|
+| `users` | `id` UUID, `email`, `password_hash`, `full_name`, `role` enum (`employee`\|`supervisor`\|`hrd`), `is_active`, audit `created_at` / `updated_at` / `created_by` / `updated_by` |
+
+**Direncanakan (selaras PRD):**
 
 | Entitas | Deskripsi singkat |
 |---------|-------------------|
-| `users` | Akun, role, status aktif |
 | `employees` | Profil karyawan, relasi supervisor, enroll face ref |
-| `locations` / `geofences` | Titik/radius lokasi kerja yang diizinkan |
-| `attendance_records` | Clock-in/out, timestamp, lat/lng, hasil validasi wajah & GPS |
-| `leave_requests` | Izin/cuti, status approval |
-| `overtime_requests` | Lembur, status approval |
+| `locations` / `geofences` | Titik/radius lokasi kerja |
+| `attendance_records` | Clock-in/out, lat/lng, hasil face & GPS |
+| `leave_requests` | Izin/cuti + status approval |
+| `overtime_requests` | Lembur + status approval |
 | `notifications` | Log / outbox notifikasi (opsional) |
-| `audit_logs` | Jejak aksi sensitif (approve, override, export) |
+| `audit_logs` | Jejak aksi sensitif |
 
-### ERD ringkas (draft)
+### ERD target (draft)
 
 ```mermaid
 erDiagram
@@ -202,6 +250,8 @@ erDiagram
   USERS {
     uuid id PK
     string email
+    string password_hash
+    string full_name
     string role
     boolean is_active
   }
@@ -242,20 +292,18 @@ erDiagram
   }
 ```
 
-Schema detail (index, constraint) dilengkapi Minggu 2.
-
 ### 5.2 Object storage
 
-- Path terpisah per environment: `dev/`, `staging/`, `prod/`
-- Retensi foto verifikasi: **TBD** (kebijakan privasi & kebutuhan audit)
+- Path terpisah per environment: `dev/`, `prod/`
+- Retensi foto verifikasi: **TBD**
 
-### 5.3 Backup & recovery (draft)
+### 5.3 Backup & recovery
 
-| Item | Rencana draft |
-|------|---------------|
-| DB backup | Daily automated backup (staging/prod) |
-| Retention | Minimal 7–30 hari (disepakati kemudian) |
-| Restore drill | Minimal 1x sebelum go-live / demo akhir |
+| Item | Rencana |
+|------|---------|
+| DB backup | Neon automated backup (branch/point-in-time sesuai plan) |
+| Retention | Mengikuti kebijakan Neon + kebutuhan audit (TBD) |
+| Restore drill | Minimal 1x sebelum demo akhir |
 
 ---
 
@@ -263,23 +311,25 @@ Schema detail (index, constraint) dilengkapi Minggu 2.
 
 ### Prinsip
 
-- Semua trafik klien ↔ API memakai **HTTPS**
-- Autentikasi berbasis token (JWT atau session token — keputusan Minggu 2)
-- **RBAC** ketat sesuai persona di PRD
-- Secret hanya di secret manager / env CI — tidak di Git
-- Face template & foto: akses private; tidak expose URL publik permanen
+- Trafik klien ↔ API memakai **HTTPS** (Workers)
+- Autentikasi **JWT Bearer** (sudah diimplementasikan untuk login/me)
+- **RBAC** sesuai persona PRD (`employee` / `supervisor` / `hrd`)
+- Secret di GitHub Environments / Wrangler secrets — tidak di Git
+- Face template & foto: akses private (saat fitur hadir)
 
-### Checklist keamanan draft
+### Checklist keamanan
 
+- [x] JWT + hashed password (`bcryptjs`)
+- [x] Role di claim / model user
 - [ ] Rate limiting pada endpoint login & absensi
 - [ ] Validasi input & ukuran upload gambar
-- [ ] CORS terbatas ke origin web dashboard
-- [ ] Logging tanpa menyimpan data sensitif berlebihan di plain log
-- [ ] Prinsip least privilege untuk service account storage/FCM
+- [ ] CORS diperketat ke origin web dashboard (saat ini `*` di Worker vars — tinjau sebelum prod ketat)
+- [ ] Logging tanpa data sensitif berlebihan
+- [ ] Least privilege untuk service account storage/FCM
 
 ---
 
-## 7. Deployment & CI/CD (draft)
+## 7. Deployment & CI/CD
 
 ### Repositories
 
@@ -290,109 +340,118 @@ Schema detail (index, constraint) dilengkapi Minggu 2.
 | Mobile | [Capstone-Project-Team-B-2026/mobile](https://github.com/Capstone-Project-Team-B-2026/mobile) |
 | Docs | [Capstone-Project-Team-B-2026/docs](https://github.com/Capstone-Project-Team-B-2026/docs) |
 
-### Pipeline usulan
+### Pipeline backend (aktual)
 
 ```mermaid
 flowchart LR
-  A[Push / PR] --> B[Lint + Unit test]
-  B --> C[Build artifact]
-  C --> D[Deploy Staging]
-  D --> E[UAT]
-  E --> F{Approve?}
-  F -->|Ya| G[Promote Production]
-  F -->|Tidak| H[Perbaiki & ulang]
-  H --> A
+  PR[PR / push] --> CI[ci.yml<br/>format · lint · typecheck · coverage ≥95%]
+  PushMain[Push main] --> DeployDev[deploy.yml → Worker development]
+  Tag[Tag v*] --> DeployProd[deploy.yml → Worker production]
+  CI --> Gate[Quality gate]
 ```
 
-### Deployment view (draft)
+| Workflow | Isi |
+|----------|-----|
+| `.github/workflows/ci.yml` | Prettier check, ESLint, `tsc`, `bun test --coverage` (threshold **≥ 95%**) |
+| `.github/workflows/deploy.yml` | Test/coverage → upload secrets → `wrangler deploy` |
+
+Lokal: Husky + lint-staged (eslint --fix + prettier) pada pre-commit; juga `openapi:export` + stage `openapi.json`.
+
+### Pipeline web & mobile
+
+| Repo | CI | Deploy / artefak |
+|------|----|------------------|
+| **Web** | format · lint · typecheck · test (coverage soft, tidak digate ≥95%) | `main` → GH Pages `/web/dev/` · tag `v*` → `/web/` |
+| **Mobile** | format · lint · typecheck · test | `main` → APK debug (dev artifact) · tag `v*` → APK debug (stg artifact) |
+
+Klien memakai **Orval** dari salinan `openapi/openapi.json` (sync manual dari backend `main` via `api:sync`).
+
+### Deployment view
 
 ```mermaid
 flowchart TB
-  subgraph CI_CD[CI / CD]
-    GH[GitHub Actions]
+  subgraph CI_CD[GitHub Actions]
+    GH[ci.yml + deploy.yml]
   end
 
   subgraph Runtime
-    API[API Container]
-    WEB[Web Static / Host]
+    API[Cloudflare Workers<br/>Hono API]
+    WEB[Web · TBD]
     MOB[Android APK / AAB]
   end
 
   subgraph DataPlane[Data & Integrasi]
-    DB[(PostgreSQL / MySQL)]
-    S3[(Firebase / S3)]
-    FCM[FCM]
+    DB[(Neon PostgreSQL)]
+    Store[(Object storage TBD)]
+    FCM[FCM TBD]
   end
 
   GH --> API
   GH --> WEB
   GH --> MOB
   API --> DB
-  API --> S3
-  API --> FCM
+  API -.-> Store
+  API -.-> FCM
 ```
 
-| Komponen | Strategi draft |
-|----------|----------------|
-| Backend | Container (Docker) di VPS / PaaS / cloud run setara |
-| Web | Static build (CDN / GitHub Pages / hosting static) atau SSR host |
-| Mobile | Build APK/AAB via CI; distribusi internal (UAT) lalu store/internal track |
-| Docs | Docusaurus → GitHub Pages (`/docs`) |
-
-*Provider cloud final (Firebase-centric vs AWS-centric) dipilih setelah spike Minggu 2–3.*
+| Komponen | Strategi |
+|----------|----------|
+| **Backend** | Cloudflare Workers + Neon · trunk-based (`main` → dev, `v*` → prod) |
+| Web | **GitHub Pages** (`main` → `/dev`, tag `v*` → `/`) |
+| Mobile | **GitHub Actions** APK artifact (`main` → dev, tag `v*` → stg) |
+| Docs | Docusaurus → GitHub Pages |
 
 ---
 
 ## 8. Observabilitas
 
-| Aspek | Draft approach |
-|-------|----------------|
-| Logging | Structured logs (request id, user id hashed/role, endpoint, latency) |
-| Metrics | Error rate, latency p95 endpoint absensi, FCM failure rate |
-| Alerting | Notifikasi channel tim jika API staging/prod down (TBD tool) |
-| Audit | Persist hasil face/GPS validation pada `attendance_records` |
+| Aspek | Approach |
+|-------|----------|
+| Logging | Structured logs (request id, role, endpoint, latency) — diperkaya bertahap |
+| Metrics | Error rate, latency p95 absensi, FCM failure *(saat fitur ada)* |
+| Alerting | Channel tim jika Worker/API down (TBD tool) |
+| Audit | Persist hasil face/GPS pada `attendance_records` |
 
 ---
 
-## 9. Kapasitas & asumsi skala (draft)
+## 9. Kapasitas & asumsi skala
 
-Asumsi awal untuk sizing (bukan SLA formal):
-
-- Pengguna: satu divisi Operation (puluhan hingga ratusan karyawan — dikonfirmasi wawancara)
+- Pengguna: satu divisi Operation (puluhan–ratusan — dikonfirmasi wawancara)
 - Pola beban: spike clock-in di awal shift
-- Laporan: generate on-demand, bukan batch besar real-time
+- Laporan: generate on-demand
 
-Rekomendasi: vertical scale kecil + connection pooling DB; antrian async untuk generate laporan berat jika diperlukan (P1).
+Neon + Workers cocok untuk spike ringan; laporan berat dapat diantrikan (P1) jika perlu.
 
----
-
-## 10. Keputusan terbuka (ADR candidates)
-
-Keputusan berikut **belum final** dan perlu dicatat sebagai ADR saat dipilih:
-
-| ID | Keputusan | Opsi | Target putusan |
-|----|-----------|------|----------------|
-| D-01 | Stack mobile | Flutter vs React Native | Minggu 2 |
-| D-02 | Stack web | React vs Vue | Minggu 2 |
-| D-03 | Stack API | Express vs FastAPI | Minggu 2 |
-| D-04 | Database | PostgreSQL vs MySQL | Minggu 2 |
-| D-05 | Face recognition runtime | Embedded di API vs service terpisah | Minggu 2–3 |
-| D-06 | Object storage + auth vendor | Firebase vs AWS | Minggu 2–3 |
-| D-07 | Hosting production | VPS / PaaS / serverless | Minggu 3–4 |
-| D-08 | Retensi foto wajah | Durasi & legal/privacy | Minggu 2 + stakeholder |
+**Catatan Workers:** Neon HTTP driver **tidak** mendukung interactive transaction multi-statement — use case yang butuh atomicity multi-query harus memakai batch Neon atau desain ulang (lihat `AGENTS.md` backend).
 
 ---
 
-## 11. Rencana implementasi infrastruktur (selaras jadwal proposal)
+## 10. Keputusan (ADR)
 
-| Minggu | Aktivitas infrastruktur |
-|--------|-------------------------|
-| 1 | Inventaris kebutuhan non-fungsional; draft env & secret policy |
-| 2 | Finalisasi stack; ERD; diagram deployment; repo bootstrap + Docker Compose |
-| 3–4 | Staging API + face + geofence; storage & FCM wiring |
-| 4–6 | CI untuk mobile/web; environment staging lengkap |
-| 6–7 | Hardening staging untuk integration test & UAT |
-| 8 | Production deploy, backup check, evaluasi, dokumentasi final |
+| ID | Keputusan | Status | Catatan |
+|----|-----------|--------|---------|
+| D-01 | Stack mobile | **Dipilih** | Vue 3 + Capacitor (Android) · Orval dari OpenAPI |
+| D-02 | Stack web | **Dipilih** | Vue 3 + Vite · Orval dari OpenAPI · GH Pages |
+| D-03 | Stack API | **Dipilih** | Bun + TypeScript + Hono + Zod OpenAPI + DDD |
+| D-04 | Database | **Dipilih** | Neon PostgreSQL + Drizzle |
+| D-05 | Face recognition runtime | **Terbuka** | Embedded vs service |
+| D-06 | Object storage | **Terbuka** | Firebase vs R2/S3 |
+| D-07 | Hosting API | **Dipilih** | Cloudflare Workers |
+| D-08 | Auth token | **Dipilih** | JWT Bearer |
+| D-09 | Retensi foto wajah | **Terbuka** | Legal/privacy + stakeholder |
+
+---
+
+## 11. Rencana implementasi infrastruktur
+
+| Minggu | Aktivitas |
+|--------|-----------|
+| 1 | Inventaris NFR; draft env & secret policy |
+| 2 | **Done (backend):** stack API, Neon, Workers bootstrap, OpenAPI, CI coverage |
+| 3–4 | Attendance + face + geofence API; storage & FCM spike |
+| 4–6 | CI mobile/web; harden development Worker |
+| 6–7 | Integrasi & UAT terhadap API development/production |
+| 8 | Production tag release, backup check, evaluasi, dokumentasi final |
 
 ---
 
@@ -400,11 +459,12 @@ Keputusan berikut **belum final** dan perlu dicatat sebagai ADR saat dipilih:
 
 | Risiko | Mitigasi |
 |--------|----------|
-| Belum ada keputusan cloud tunggal | Spike singkat + skor (biaya, kemudahan FCM, S3-like) |
-| Biaya face recognition CPU | Cache embedding; batasi resolusi upload; queue jika perlu |
-| Ketergantungan GPS device | Timeout & messaging UX; radius geofence dapat dikonfigurasi |
-| Secret bocor di repo | Pre-commit secret scan; env contoh `.env.example` saja |
-| Downtime saat demo | Staging warm + checklist smoke test H-1 |
+| Batasan transaction Neon HTTP di Workers | Desain use case tanpa multi-statement TX; batch API bila perlu |
+| CORS `*` di Worker | Kunci ke origin web sebelum prod formal |
+| Biaya / latency face recognition | Cache embedding; batasi resolusi; queue |
+| Ketergantungan GPS device | Timeout UX; radius geofence configurable |
+| Secret bocor | Env example saja; secrets di GitHub Environments / Wrangler |
+| Downtime demo | Smoke test H-1 pada Worker development + production |
 
 ---
 
@@ -413,11 +473,13 @@ Keputusan berikut **belum final** dan perlu dicatat sebagai ADR saat dipilih:
 | Versi | Tanggal | Perubahan |
 |-------|---------|-----------|
 | 0.1.0 | 2026-09-22 | Draft awal dari proposal capstone Kelompok B |
+| 0.2.0 | 2026-09-23 | Selaraskan dengan backend aktual: Bun/Hono/Drizzle/Neon/Workers, CI, JWT, env trunk-based |
 
 ---
 
 ## Referensi
 
+- Backend README / AGENTS: [Capstone-Project-Team-B-2026/backend](https://github.com/Capstone-Project-Team-B-2026/backend)
 - Proposal Capstone Project — Pengembangan Aplikasi Absensi Divisi Operation (Kelompok B, 2026)
 - [Product Requirements Document (PRD)](./prd)
 - [Introduction](./)
