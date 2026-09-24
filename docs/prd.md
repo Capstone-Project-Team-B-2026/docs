@@ -6,13 +6,13 @@ title: Product Requirements Document (PRD)
 # Product Requirements Document (PRD)
 
 :::info Status
-**v0.2.0 — Keputusan domain terkunci (2026-09-24)** untuk MVP semester ini. Wawancara lapangan boleh menambah *catatan*, tetapi perubahan rule di bawah memerlukan update PRD + persetujuan Project Leader.
+**v0.2.1 — Keputusan domain terkunci (2026-09-24)** untuk MVP semester ini. Wawancara lapangan boleh menambah *catatan*, tetapi perubahan rule di bawah memerlukan update PRD + persetujuan Project Leader.
 :::
 
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.2.0 |
+| Version | 0.2.1 |
 | Mata Kuliah | STSI4440 |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
 | Last updated | 2026-09-24 |
@@ -107,7 +107,8 @@ flowchart TB
 | Kuota/saldo cuti | **CUT MVP** — jenis leave enum saja |
 | Roster shift per karyawan | **CUT MVP** — satu default shift organisasi |
 | Approve di mobile | **CUT MVP** — supervisor approve hanya di web |
-| Quiet hours / FCM penuh | Preferensi lanjut & channel FCM = P2; MVP cukup in-app notification feed |
+| Quiet hours / preferensi lanjut | Preferensi quiet hours = P2; **FCM + in-app feed dipakai untuk approval P0** |
+| Object storage | **Cloudflare R2** (bukan Firebase Storage) |
 
 ---
 
@@ -260,10 +261,10 @@ flowchart LR
 - **Backend (terkunci):** Bun + Hono + Drizzle + Neon PostgreSQL + Cloudflare Workers — lihat [Infrastructure](./infrastructure)
 - **Web (terkunci):** Vue 3 + Vite + TypeScript + Orval → Cloudflare Pages
 - **Mobile (terkunci):** React Native + Expo (SDK 57) + Expo Router + Orval → APK via GitHub Actions
-- Library face recognition (mis. face-api.js / Python `face_recognition`) — *TBD*
+- Library face recognition (mis. face-api.js / Python `face_recognition`) — *TBD runtime*
 - Geolocation API + konfigurasi geofencing (server-side)
-- Firebase Cloud Messaging (atau setara) untuk push notification — *TBD*
-- Cloud storage (Firebase / R2 / S3) untuk aset terkait absensi — *TBD*
+- **Firebase Cloud Messaging (FCM)** — push Android (approval + reminder)
+- **Cloudflare R2** — objek enrollment / bukti absensi
 - Infrastruktur deployment selengkapnya: [Infrastructure Document](./infrastructure)
 
 ---
@@ -303,6 +304,9 @@ Aturan berikut mengunci perilaku produk untuk semester ini. Kontrak API, UI, dan
 | Geofence | Valid jika di **salah satu** lokasi aktif org; radius default **100 m**; akurasi GPS maks **50 m** |
 | Retry face/GPS | Maks **3** per percobaan absensi |
 | Face override | **Tidak ada** di MVP |
+| Hub setelah clock-in | CTA utama **Clock-out**; clock-in disabled sampai clock-out / hari baru (`M-ATT01`) |
+| Sukses clock-out | **Reuse** `M-ATT04` (bukan layar baru) |
+| RBAC ditolak | Route guard + toast/redirect — **tanpa** halaman denied penuh |
 
 ### 10.2 Face enrollment
 
@@ -319,11 +323,11 @@ Aturan berikut mengunci perilaku produk untuk semester ini. Kontrak API, UI, dan
 |--------|-----------|
 | Jenis leave MVP | Enum: **Sakit** \| **Cuti** \| **Izin lain** |
 | Kuota/saldo | Tidak dihitung di MVP |
-| Pending | Boleh **batal**; tidak boleh edit |
+| Pending | Boleh **batal** (kontrol di `M-LV03`); tidak boleh edit |
 | Overlap leave vs absensi valid | Tolak pengajuan |
 | OT | Tanggal + jam mulai/selesai; **maks 4 jam** (hard reject); tidak wajib link ke record absensi |
 | Approve | **Hanya web** (`W-AP*`) |
-| Tolak | **Wajib alasan** (teks singkat) |
+| Tolak | **Wajib alasan**; tombol Tolak disabled sampai alasan terisi |
 
 ### 10.4 Master data & laporan
 
@@ -339,8 +343,9 @@ Aturan berikut mengunci perilaku produk untuk semester ini. Kontrak API, UI, dan
 | Aturan | Keputusan |
 |--------|-----------|
 | Lupa password self-service | **CUT** (reset HRD) |
-| Notifikasi P0 | In-app feed + push status approval bila FCM siap |
-| Quiet hours / preferensi lanjut | P2 |
+| Notifikasi P0 | **In-app feed + FCM** untuk status approval (dan reminder bila siap) |
+| Quiet hours | P2 |
+| Object storage | **Cloudflare R2** untuk embedding/bukti terkait absensi |
 
 ---
 
@@ -365,7 +370,7 @@ MVP dianggap selesai bila:
 | GPS tidak akurat / indoor | Geofence gagal | Radius default 100 m; reject + reason code; log akurasi |
 | Scope creep fitur payroll penuh | Telat delivery | Kunci batasan: hanya ekspor |
 | Ketersediaan stakeholder UAT | Feedback terlambat | Jadwalkan UAT di Minggu 7; Atin jalankan tes manual per sprint |
-| Integrasi FCM / storage | Notifikasi / upload gagal | Spike di sprint awal; fallback in-app feed |
+| Integrasi FCM / R2 | Notifikasi / upload gagal | Wiring di S3–S5; fallback in-app feed jika FCM down |
 
 ---
 
@@ -404,6 +409,7 @@ MVP dianggap selesai bila:
 | 0.1.2 | 2026-09-24 | Milestone sprint 1 minggu; BE∥UI paralel sejak S2 |
 | 0.1.3 | 2026-09-24 | Dependensi web (Vue/CF Pages) & mobile (RN+Expo) terkunci |
 | 0.2.0 | 2026-09-24 | Kunci keputusan domain MVP; tim lengkap (Atin + Anfa); Atin = PL/Analyst + manual tester; cut face override / lupa password / kuota |
+| 0.2.1 | 2026-09-24 | Hub clock-out state, batal leave, RBAC guard; kunci FCM + Cloudflare R2 |
 
 ---
 

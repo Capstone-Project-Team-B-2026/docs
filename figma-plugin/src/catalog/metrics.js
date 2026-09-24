@@ -1,4 +1,4 @@
-/** PRD success metrics + per-screen hints */
+/** PRD success metrics + per-screen story hints (planning board only; not drawn inside screen frames). */
 
 export const NORTH_STAR = {
   id: 'NS-01',
@@ -14,7 +14,8 @@ export const PRODUCT_METRICS = [
   { id: 'NTF', name: 'Latency notifikasi', target: '< 1 menit', note: 'Setelah event approval' },
 ];
 
-const MAP = {
+/** @type {Record<string, { value: string, label: string }[]>} */
+export const SCREEN_METRIC_HINTS = {
   'M-H01': [{ value: 'ATT-04', label: 'Status hari ini' }, { value: '≤3', label: 'Langkah clock-in' }],
   'M-ATT01': [{ value: 'ATT-01', label: 'Clock entry' }],
   'M-ATT02': [{ value: 'ATT-02', label: 'Face validation' }],
@@ -35,5 +36,5 @@ const MAP = {
 };
 
 export function metricsFor(id) {
-  return MAP[id] || [];
+  return SCREEN_METRIC_HINTS[id] || [];
 }

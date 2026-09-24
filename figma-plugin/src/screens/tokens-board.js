@@ -1,7 +1,7 @@
 import { C, TOKEN_SWATCHES, paint, R } from '../tokens.js';
 import { txt, wrapTxt, row, col, stretch } from '../ui/layout.js';
 import { cta, secondaryCta, ghostCta, pill, progress, card } from '../ui/primitives.js';
-import { NORTH_STAR, PRODUCT_METRICS } from '../catalog/metrics.js';
+import { NORTH_STAR, PRODUCT_METRICS, SCREEN_METRIC_HINTS } from '../catalog/metrics.js';
 import { MOBILE_SCREENS, WEB_SCREENS } from '../catalog/ids.js';
 
 export async function generateTokens(page, x, y) {
@@ -106,7 +106,12 @@ export async function generateMetricsBoard(page, x, y) {
   page.appendChild(board);
 
   board.appendChild(txt('PRD — Tujuan & Metrik', 28, 'Bold', C.ink900));
-  board.appendChild(wrapTxt('Draft success metrics dari PRD §2 + cakupan layar M-* / W-*.', 14, 'Regular', C.ink500));
+  board.appendChild(wrapTxt(
+    'Success metrics PRD §2. Mapping story↔screen ada di board ini saja — tidak diinjeksikan ke frame M-*/W-* agar slicing tidak terkecoh.',
+    14,
+    'Regular',
+    C.ink500,
+  ));
 
   const ns = card('NorthStar');
   ns.appendChild(pill(NORTH_STAR.id, C.accent, C.white));
@@ -127,6 +132,14 @@ export async function generateMetricsBoard(page, x, y) {
   cov.appendChild(txt('Screen coverage', 16, 'Bold', C.ink900));
   cov.appendChild(wrapTxt('Mobile M-* : ' + MOBILE_SCREENS.length + ' · Web W-* : ' + WEB_SCREENS.length, 14, 'Regular', C.ink700));
   board.appendChild(cov);
+
+  const mapCard = card('ScreenStoryMap');
+  mapCard.appendChild(txt('Story hints per screen (planning only)', 16, 'Bold', C.ink900));
+  Object.keys(SCREEN_METRIC_HINTS).sort().forEach((id) => {
+    const hints = SCREEN_METRIC_HINTS[id].map((h) => h.value + ' ' + h.label).join(' · ');
+    mapCard.appendChild(wrapTxt(id + ' — ' + hints, 12, 'Regular', C.ink700));
+  });
+  board.appendChild(mapCard);
 
   return board;
 }

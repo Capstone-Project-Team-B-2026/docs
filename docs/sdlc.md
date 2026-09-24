@@ -12,7 +12,7 @@ title: Software Development Life Cycle (SDLC)
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.1.4 (Draft) |
+| Version | 0.1.5 (Draft) |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
 | Last updated | 2026-09-24 |
 
@@ -66,6 +66,7 @@ Prinsip kerja:
 - Setiap sprint menghasilkan increment yang bisa di-demo (API dan/atau UI).
 - Scope creep ditahan lewat Definition of Done + batasan MVP di PRD.
 - Board GitHub Project: filter **This Sprint** = `sprint:@current -status:Icebox`; view **All** diurutkan by Sprint.
+- **Otomasi:** workflow [`project-sprint-backlog.yml`](https://github.com/Capstone-Project-Team-B-2026/docs/blob/main/.github/workflows/project-sprint-backlog.yml) (cron harian + manual) mempromosikan item `[Contract]` / `[UI]` / `[Test]` yang sprint-nya sudah mulai dari **Icebox → Backlog**. `[Impl]` / `[API]` tetap Icebox sampai di-unblock. Secret repo docs: `PROJECT_TOKEN` (Projects write).
 
 ---
 
@@ -86,7 +87,7 @@ Prinsip kerja:
 |------|-----|
 | Aktivitas | Arsitektur sistem, skema DB, wireframe/UI, kontrak API |
 | Output | [Infrastructure](./infrastructure), [Design System](./design-system), [Screens](./screens), OpenAPI (`/docs` backend) |
-| Gate | Stack BE/web/mobile terkunci; face/storage/FCM yang masih TBD dijadwalkan spike |
+| Gate | Stack BE/web/mobile terkunci; **FCM + Cloudflare R2 terkunci**; face runtime spike di S3–S5 |
 
 ### 3.3 Implementasi (build)
 
@@ -292,6 +293,7 @@ Risiko produk (akurasi wajah, GPS, dll.) tetap di [PRD §11](./prd).
 | 0.1.2 | 2026-09-24 | Tautan ke Git Workflow & Dev Setup |
 | 0.1.3 | 2026-09-24 | Gate desain: stack web/mobile terkunci (Vue Pages + RN Expo) |
 | 0.1.4 | 2026-09-24 | Tim: Moch Riswan Lutfin Anfa; Atin = PL/Analyst + manual tester (`atmcorporation` ≠ `anfariswan`) |
+| 0.1.5 | 2026-09-24 | FCM+R2 terkunci; automation Icebox→Backlog untuk Contract/UI/Test saat sprint mulai |
 
 ---
 

@@ -24,9 +24,9 @@ Keputusan domain MVP terkunci di [PRD §10](./prd#10-keputusan-domain-terkunci-m
 
 | Dokumen | Status | Deskripsi |
 |---------|--------|-----------|
-| [Product Requirements Document (PRD)](./prd) | **v0.2.0** (keputusan domain terkunci) | Kebutuhan produk, scope, user stories, acceptance criteria |
+| [Product Requirements Document (PRD)](./prd) | **v0.2.1** (keputusan domain terkunci) | Kebutuhan produk, scope, user stories, acceptance criteria |
 | [Software Development Life Cycle (SDLC)](./sdlc) | Draft | Proses hybrid Waterfall + Scrum, fase, DoD, release |
-| [Infrastructure Document](./infrastructure) | Draft v0.3 | Stack terkunci: BE Workers · web CF Pages · mobile Expo/RN |
+| [Infrastructure Document](./infrastructure) | Draft v0.3.1 | Stack terkunci + **FCM** + **Cloudflare R2** |
 | [Design System](./design-system) | Draft | Token warna, tipografi, komponen, pola UI |
 | [Screens & Pages](./screens) | Draft | Inventaris layar mobile (M-*) & web (W-*) |
 | [Development Tools Setup](./dev-setup) | Draft | Instalasi Git, VS Code, Bun/npm, JDK, Android Studio (fokus Windows) |

@@ -402,33 +402,6 @@
     items.forEach(([value, label, color]) => r.appendChild(metricTile(value, label, color)));
     return r;
   }
-  function metricGrid(items, columns) {
-    const cols = columns || 2;
-    const grid = col("MetricGrid", 8);
-    stretch(grid);
-    for (let i = 0; i < items.length; i += cols) {
-      const r = row("MetricRow", 8);
-      stretch(r);
-      r.counterAxisAlignItems = "MIN";
-      for (let j = i; j < Math.min(i + cols, items.length); j++) {
-        const m = items[j];
-        const cell = col("m", 2);
-        cell.layoutGrow = 1;
-        stretch(cell);
-        cell.appendChild(wrapTxt(m.value, 14, "Bold", C.ink900));
-        cell.appendChild(wrapTxt(m.label, 12, "Medium", C.ink500));
-        r.appendChild(cell);
-      }
-      const remainder = cols - (Math.min(i + cols, items.length) - i);
-      for (let k = 0; k < remainder; k++) {
-        const spacer = col("spacer", 0);
-        spacer.layoutGrow = 1;
-        r.appendChild(spacer);
-      }
-      grid.appendChild(r);
-    }
-    return grid;
-  }
   function sectionTitle(title, meta) {
     const wrap = col("Section", 4);
     stretch(wrap);
@@ -470,7 +443,7 @@
     { id: "UAT", name: "Adoption UAT", target: "\u2265 80%", note: "Skenario utama lulus" },
     { id: "NTF", name: "Latency notifikasi", target: "< 1 menit", note: "Setelah event approval" }
   ];
-  var MAP = {
+  var SCREEN_METRIC_HINTS = {
     "M-H01": [{ value: "ATT-04", label: "Status hari ini" }, { value: "\u22643", label: "Langkah clock-in" }],
     "M-ATT01": [{ value: "ATT-01", label: "Clock entry" }],
     "M-ATT02": [{ value: "ATT-02", label: "Face validation" }],
@@ -489,9 +462,6 @@
     "W-R03": [{ value: "RPT-03", label: "PDF / Excel" }],
     "W-H01": [{ value: "AUTH-02", label: "Kelola akun" }]
   };
-  function metricsFor(id) {
-    return MAP[id] || [];
-  }
 
   // src/catalog/ids.js
   var MOBILE_SCREENS = [
@@ -638,7 +608,12 @@
     board.counterAxisSizingMode = "FIXED";
     page.appendChild(board);
     board.appendChild(txt("PRD \u2014 Tujuan & Metrik", 28, "Bold", C.ink900));
-    board.appendChild(wrapTxt("Draft success metrics dari PRD \xA72 + cakupan layar M-* / W-*.", 14, "Regular", C.ink500));
+    board.appendChild(wrapTxt(
+      "Success metrics PRD \xA72. Mapping story\u2194screen ada di board ini saja \u2014 tidak diinjeksikan ke frame M-*/W-* agar slicing tidak terkecoh.",
+      14,
+      "Regular",
+      C.ink500
+    ));
     const ns = card("NorthStar");
     ns.appendChild(pill(NORTH_STAR.id, C.accent, C.white));
     ns.appendChild(txt(NORTH_STAR.name, 18, "Bold", C.ink900));
@@ -656,6 +631,13 @@
     cov.appendChild(txt("Screen coverage", 16, "Bold", C.ink900));
     cov.appendChild(wrapTxt("Mobile M-* : " + MOBILE_SCREENS.length + " \xB7 Web W-* : " + WEB_SCREENS.length, 14, "Regular", C.ink700));
     board.appendChild(cov);
+    const mapCard = card("ScreenStoryMap");
+    mapCard.appendChild(txt("Story hints per screen (planning only)", 16, "Bold", C.ink900));
+    Object.keys(SCREEN_METRIC_HINTS).sort().forEach((id) => {
+      const hints = SCREEN_METRIC_HINTS[id].map((h) => h.value + " " + h.label).join(" \xB7 ");
+      mapCard.appendChild(wrapTxt(id + " \u2014 " + hints, 12, "Regular", C.ink700));
+    });
+    board.appendChild(mapCard);
     return board;
   }
 
@@ -776,14 +758,6 @@
     }
     const body = scrollBody("Body");
     phone.appendChild(body);
-    const mets = metricsFor(id);
-    if (mets.length && o.showMetrics !== false) {
-      const strip = softCard("ScreenMetrics", C.primarySubtle);
-      strip.itemSpacing = 8;
-      strip.appendChild(txt("Metrik layar", 12, "SemiBold", C.primaryDark));
-      strip.appendChild(metricGrid(mets, 2));
-      body.appendChild(strip);
-    }
     build({ phone, body, wrap, opts: o });
     if (!o.hideNav) {
       phone.appendChild(bottomNav(o.tab || "Beranda"));
@@ -840,7 +814,7 @@
       positions.placeMobile(wrap);
       return wrap;
     };
-    put("M-A01", "Splash", { hideNav: true, header: "none", showMetrics: false }, ({ phone, body }) => {
+    put("M-A01", "Splash", { hideNav: true, header: "none" }, ({ phone, body }) => {
       phone.fills = paint(C.primary);
       body.primaryAxisAlignItems = "CENTER";
       body.counterAxisAlignItems = "CENTER";
@@ -849,14 +823,14 @@
       body.appendChild(space(24));
       body.appendChild(txt("Memeriksa sesi\u2026", 13, "Medium", C.primarySoft));
     });
-    put("M-A02", "Masuk", { hideNav: true, showMetrics: false }, ({ body }) => {
+    put("M-A02", "Masuk", { hideNav: true }, ({ body }) => {
       body.appendChild(sectionTitle("Masuk ke Nexus Ops", "Karyawan Divisi Operation"));
       body.appendChild(inputField("Email / NIP", "nip@perusahaan.com"));
       body.appendChild(inputField("Kata sandi", "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"));
       body.appendChild(cta("Masuk", C.primary));
       body.appendChild(wrapTxt("Lupa sandi? Hubungi HRD untuk reset akun.", 12, "Regular", C.ink500));
     });
-    put("M-A03", "Sesi berakhir", { hideNav: true, showMetrics: false }, ({ body }) => {
+    put("M-A03", "Sesi berakhir", { hideNav: true }, ({ body }) => {
       body.appendChild(banner("Sesi berakhir demi keamanan. Silakan masuk lagi.", C.warningSoft, C.warning));
       body.appendChild(cta("Masuk kembali", C.primary));
     });
@@ -886,16 +860,16 @@
       return wrap;
     };
     put("M-ATT01", "Hub absensi", { tab: "Absensi" }, ({ body }) => {
-      body.appendChild(sectionTitle("Absensi hari ini", "Clock-in & clock-out \u2014 keduanya wajah + GPS"));
+      body.appendChild(sectionTitle("Absensi hari ini", "Sudah clock-in \xB7 lanjut clock-out (wajah + GPS)"));
       body.appendChild(metricRow([
-        ["\u2014", "Masuk", C.ink500],
+        ["07:28", "Masuk", C.success],
         ["\u2014", "Keluar", C.ink500]
       ]));
-      body.appendChild(cta("Clock-in", C.primary));
-      body.appendChild(secondaryCta("Clock-out"));
+      body.appendChild(cta("Clock-out", C.primary));
+      body.appendChild(wrapTxt("Clock-in dinonaktifkan sampai clock-out / hari berikutnya.", 12, "Regular", C.ink500));
       body.appendChild(ghostCta("Lihat riwayat"));
     });
-    put("M-ATT02", "Capture wajah", { hideNav: true, showMetrics: true }, ({ body }) => {
+    put("M-ATT02", "Capture wajah", { hideNav: true }, ({ body }) => {
       body.appendChild(sectionTitle("Verifikasi wajah", "Pastikan pencahayaan cukup"));
       body.appendChild(faceFrame("Tahan diam\u2026"));
       body.appendChild(cta("Ambil foto", C.primary));
@@ -909,11 +883,13 @@
       body.appendChild(cta("Lanjut validasi", C.primary));
     });
     put("M-ATT04", "Absensi berhasil", { hideNav: true }, ({ body }) => {
-      body.appendChild(banner("Clock-in tersimpan", C.successSoft, C.success));
+      body.appendChild(banner("Absensi tersimpan", C.successSoft, C.success));
       body.appendChild(sectionTitle("07:28 WIB", "Senin, 22 Sep 2026"));
+      body.appendChild(kvRow("Jenis", "Clock-in"));
       body.appendChild(kvRow("Wajah", "Cocok"));
       body.appendChild(kvRow("GPS", "Dalam area \xB7 \xB112m"));
       body.appendChild(kvRow("Lokasi", "Site A"));
+      body.appendChild(wrapTxt("Frame yang sama dipakai untuk clock-out (ganti Jenis + jam).", 12, "Regular", C.ink500));
       body.appendChild(cta("Kembali ke beranda", C.primary));
     });
     put("M-ATT05", "Gagal wajah", { hideNav: true }, ({ body }) => {
@@ -956,11 +932,14 @@
       return wrap;
     };
     put("M-LV01", "Daftar izin/cuti", { tab: "Pengajuan" }, ({ body }) => {
-      body.appendChild(sectionTitle("Izin & cuti", "Pengajuan Anda"));
+      body.appendChild(sectionTitle("Pengajuan", "Segment Izin | Lembur (satu tab)"));
+      const seg = softCard("Segment", C.primarySubtle);
+      seg.appendChild(txt("\u25CF Izin/Cuti     \u25CB Lembur", 13, "SemiBold", C.primaryDark));
+      body.appendChild(seg);
       body.appendChild(cta("Ajukan baru", C.primary));
-      body.appendChild(listRow("Izin sakit", "22\u201323 Sep", pill("Pending", C.warningSoft, C.warning)));
-      body.appendChild(listRow("Cuti tahunan", "1\u20135 Agu", pill("Disetujui", C.successSoft, C.success)));
-      body.appendChild(listRow("Izin keluarga", "12 Jul", pill("Ditolak", C.errorSoft, C.error)));
+      body.appendChild(listRow("Sakit", "22\u201323 Sep", pill("Pending", C.warningSoft, C.warning)));
+      body.appendChild(listRow("Cuti", "1\u20135 Agu", pill("Disetujui", C.successSoft, C.success)));
+      body.appendChild(listRow("Izin lain", "12 Jul", pill("Ditolak", C.errorSoft, C.error)));
     });
     put("M-LV02", "Form ajukan izin", { tab: "Pengajuan", hideNav: true }, ({ body }) => {
       body.appendChild(inputField("Jenis", "Sakit / Cuti / Izin lain", "Sakit"));
@@ -972,10 +951,11 @@
     });
     put("M-LV03", "Detail pengajuan", { tab: "Pengajuan" }, ({ body }) => {
       body.appendChild(pill("Pending", C.warningSoft, C.warning));
-      body.appendChild(sectionTitle("Izin sakit", "22\u201323 Sep 2026"));
+      body.appendChild(sectionTitle("Sakit", "22\u201323 Sep 2026"));
       body.appendChild(kvRow("Diajukan", "21 Sep \xB7 18:02"));
       body.appendChild(kvRow("Supervisor", "Andi Pratama"));
       body.appendChild(wrapTxt("Demam, istirahat di rumah.", 14, "Regular", C.ink700));
+      body.appendChild(ghostCta("Batalkan pengajuan"));
     });
     put("M-LV04", "Pengajuan terkirim", { hideNav: true }, ({ body }) => {
       body.appendChild(banner("Pengajuan terkirim. Supervisor mendapat notifikasi.", C.successSoft, C.success));
@@ -1174,14 +1154,6 @@
   function buildWeb(page, id, title, activeNav, chrome, build) {
     const { wrap, content } = webShell(id, title, 0, 0, activeNav, chrome);
     page.appendChild(wrap);
-    const mets = metricsFor(id);
-    if (mets.length && chrome !== "none") {
-      const strip = softCard("ScreenMetrics", C.primarySubtle);
-      strip.itemSpacing = 8;
-      strip.appendChild(txt("Metrik halaman", 12, "SemiBold", C.primaryDark));
-      strip.appendChild(metricGrid(mets, 2));
-      content.appendChild(strip);
-    }
     build({ content, wrap });
     fixCollapsedText(wrap);
     return wrap;
@@ -1226,6 +1198,7 @@
       content.appendChild(wrapTxt("Demam, istirahat di rumah.", 14, "Regular", C.ink700));
       content.appendChild(kvRow("Diajukan", "21 Sep \xB7 18:02"));
       content.appendChild(inputField("Alasan penolakan (wajib jika tolak)", "Contoh: overlapping absensi"));
+      content.appendChild(wrapTxt("Tolak disabled sampai alasan terisi (validasi FE).", 12, "Regular", C.ink500));
       const actions = row("Actions", 12);
       stretch(actions);
       const a = cta("Setujui", C.success);

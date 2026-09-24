@@ -12,7 +12,7 @@ src/
   fonts.js
   catalog/
     ids.js                 all M-* (26) + W-* (18)
-    metrics.js             PRD metrics + per-screen hints
+    metrics.js             PRD metrics + story hints (board only, not inside screens)
   ui/
     layout.js / primitives.js / device.js / web-shell.js
   screens/
@@ -34,7 +34,8 @@ In Figma: **Plugins → Development → Import plugin from manifest…** → pil
 
 Scopes:
 
-- **Generate Everything** — tokens, PRD metrics, semua M-*, semua W-*
+- **Generate Everything** — tokens, PRD metrics board, semua M-*, semua W-*
+  (story/metric chips **tidak** digambar di dalam device/page — hanya di `PRD · Product Metrics`)
 - **Tokens + Metrics Board**
 - **Mobile Screens (M-*)**
 - **Web Pages (W-*)**

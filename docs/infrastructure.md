@@ -6,13 +6,13 @@ title: Infrastructure Document
 # Infrastructure Document
 
 :::info Status
-**Draft (stack backend + klien terkunci)** — backend Bun/Hono/Neon/Workers; web Vue 3 + Vite + Orval + **Cloudflare Pages**; mobile **React Native + Expo** + Orval + APK CI. Face/storage/push masih terbuka.
+**Draft v0.3.1** — backend Bun/Hono/Neon/Workers; web Vue 3 + CF Pages; mobile RN+Expo. **FCM + Cloudflare R2 terkunci.** Face runtime masih terbuka.
 :::
 
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.3.0 (Draft) |
+| Version | 0.3.1 |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
 | Last updated | 2026-09-24 |
 
@@ -20,7 +20,7 @@ title: Infrastructure Document
 
 ## 1. Tujuan dokumen
 
-Dokumen ini mendeskripsikan arsitektur infrastruktur Nexus Ops: komponen sistem, lingkungan, penyimpanan data, keamanan, observabilitas, dan deployment. **Backend, web, dan mobile sudah di-bootstrap** di repo terpisah; layanan pendukung (face, FCM, object storage) masih terbuka.
+Dokumen ini mendeskripsikan arsitektur infrastruktur Nexus Ops: komponen sistem, lingkungan, penyimpanan data, keamanan, observabilitas, dan deployment. **Backend, web, dan mobile sudah di-bootstrap** di repo terpisah; **FCM (push) dan Cloudflare R2 (object storage) terkunci**; face recognition runtime masih terbuka.
 
 Dokumen terkait: [PRD](./prd) · [Dev Setup](./dev-setup) · [Git Workflow](./git-workflow)
 
@@ -36,10 +36,10 @@ Sistem terdiri dari tiga permukaan klien + backend API + layanan pendukung:
 | Web | Dashboard admin / supervisor / HRD | **Vue 3 + Vite + TypeScript** · Vue Router · Orval · Vitest |
 | **API** | RESTful backend | **Bun + TypeScript + Hono** · Zod→OpenAPI · DDD modules |
 | **Data** | Relational DB | **Neon (PostgreSQL)** · Drizzle ORM |
-| AI/CV | Face recognition service | face-api.js **atau** Python `face_recognition` *(TBD)* |
-| Lokasi | GPS + geofencing | Device GPS + validasi server *(modul placeholder)* |
-| Storage | Objek (foto enroll / bukti absensi) | Firebase Storage **atau** R2/S3 *(TBD)* |
-| Push | Notifikasi | Firebase Cloud Messaging (FCM) *(TBD)* |
+| AI/CV | Face recognition service | face-api.js **atau** Python `face_recognition` *(TBD runtime)* |
+| Lokasi | GPS + geofencing | Device GPS + validasi server |
+| Storage | Objek (foto enroll / bukti absensi) | **Cloudflare R2** |
+| Push | Notifikasi | **Firebase Cloud Messaging (FCM)** |
 | Design | UI/UX | Figma (+ generator di `docs/figma-plugin`) |
 | VCS / CI | Kolaborasi & otomatisasi | GitHub · GitHub Actions |
 
@@ -58,9 +58,9 @@ flowchart TB
 
   subgraph DataPlane
     DB[(Neon PostgreSQL)]
-    FR[Face Recognition<br/>TBD]
-    OS[(Object Storage<br/>TBD)]
-    FCM[FCM Push<br/>TBD]
+    FR[Face Recognition<br/>TBD runtime]
+    OS[(Cloudflare R2)]
+    FCM[FCM Push]
   end
 
   M -->|HTTPS / REST| API
@@ -222,8 +222,9 @@ Secret / env (tidak di Git):
 | `JWT_SECRET` | Shared secret HS256 (min 16 karakter) |
 | `APP_URL` | Base URL publik Worker (per env) |
 | `APP_ENV` / `APP_NAME` / `JWT_EXPIRES_IN` / `CORS_ORIGINS` | Vars Wrangler (bukan secret) |
-
-Nanti: `FCM_*`, storage credentials, `GEOFENCE_DEFAULT_RADIUS`, dll.
+| `R2_ACCOUNT_ID` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` / `R2_BUCKET` | Cloudflare R2 (enroll / bukti) |
+| `FCM_PROJECT_ID` / `FCM_CLIENT_EMAIL` / `FCM_PRIVATE_KEY` | Service account FCM (push Android) |
+| `GEOFENCE_DEFAULT_RADIUS` | Default 100 (meter) |
 
 ---
 
@@ -458,12 +459,13 @@ Neon + Workers cocok untuk spike ringan; laporan berat dapat diantrikan (P1) jik
 | D-03 | Stack API | **Dipilih** | Bun + TypeScript + Hono + Zod OpenAPI + DDD |
 | D-04 | Database | **Dipilih** | Neon PostgreSQL + Drizzle |
 | D-05 | Face recognition runtime | **Terbuka** | Embedded vs service |
-| D-06 | Object storage | **Terbuka** | Firebase vs R2/S3 |
+| D-06 | Object storage | **Dipilih** | **Cloudflare R2** |
 | D-07 | Hosting API | **Dipilih** | Cloudflare Workers |
 | D-08 | Auth token | **Dipilih** | JWT Bearer |
-| D-09 | Retensi foto wajah | **Terbuka** | Legal/privacy + stakeholder |
+| D-09 | Retensi foto wajah | **Terbuka** | Legal/privacy + stakeholder; prefer embedding + retensi snapshot singkat |
 | D-10 | Package managers | **Dipilih** | Bun (backend, docs) · npm (web, mobile) |
 | D-11 | OpenAPI → klien | **Dipilih** | Commit `openapi.json` di backend; klien sync via `gh api` + Orval |
+| D-12 | Push notification | **Dipilih** | **Firebase Cloud Messaging (FCM)** + in-app feed |
 
 ---
 
@@ -475,7 +477,7 @@ Selaras [SDLC §4](./sdlc) (sprint 1 minggu; **BE ∥ UI** sejak S2).
 |--------|-----------|
 | S1 | Inventaris NFR; draft env & secret policy |
 | S2 | Stack API, Neon, Workers, OpenAPI, CI; bootstrap web (Vue/Pages) & mobile (Expo) + kontrak Orval |
-| S3–S5 | Attendance + face + geofence API **paralel** dengan UI; storage & FCM spike |
+| S3–S5 | Attendance + face + geofence API **paralel** dengan UI; **wiring R2 + FCM** |
 | S5–S6 | Harden CI APK / Pages; wiring API klien |
 | S7 | Integrasi & mulai UAT terhadap API development/production |
 | S8 | Production tag release, backup check, evaluasi, dokumentasi final |
@@ -503,6 +505,7 @@ Selaras [SDLC §4](./sdlc) (sprint 1 minggu; **BE ∥ UI** sejak S2).
 | 0.2.0 | 2026-09-23 | Selaraskan dengan backend aktual: Bun/Hono/Drizzle/Neon/Workers, CI, JWT, env trunk-based |
 | 0.2.1 | 2026-09-24 | Rencana infra per sprint 1 minggu; BE∥UI paralel S2–S7 |
 | 0.3.0 | 2026-09-24 | Klien terkunci: web Vue3+CF Pages; mobile RN+Expo+APK CI; Orval/`gh` sync; ADR D-01/D-02/D-10/D-11 |
+| 0.3.1 | 2026-09-24 | ADR D-06 R2 + D-12 FCM terkunci; env secrets R2/FCM |
 
 ---
 

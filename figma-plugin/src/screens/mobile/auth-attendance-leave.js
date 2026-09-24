@@ -16,7 +16,7 @@ export function generateMobileAuthHome(page, positions) {
     return wrap;
   };
 
-  put('M-A01', 'Splash', { hideNav: true, header: 'none', showMetrics: false }, ({ phone, body }) => {
+  put('M-A01', 'Splash', { hideNav: true, header: 'none' }, ({ phone, body }) => {
     phone.fills = paint(C.primary);
     body.primaryAxisAlignItems = 'CENTER';
     body.counterAxisAlignItems = 'CENTER';
@@ -26,7 +26,7 @@ export function generateMobileAuthHome(page, positions) {
     body.appendChild(txt('Memeriksa sesi…', 13, 'Medium', C.primarySoft));
   });
 
-  put('M-A02', 'Masuk', { hideNav: true, showMetrics: false }, ({ body }) => {
+  put('M-A02', 'Masuk', { hideNav: true }, ({ body }) => {
     body.appendChild(sectionTitle('Masuk ke Nexus Ops', 'Karyawan Divisi Operation'));
     body.appendChild(inputField('Email / NIP', 'nip@perusahaan.com'));
     body.appendChild(inputField('Kata sandi', '••••••••'));
@@ -34,7 +34,7 @@ export function generateMobileAuthHome(page, positions) {
     body.appendChild(wrapTxt('Lupa sandi? Hubungi HRD untuk reset akun.', 12, 'Regular', C.ink500));
   });
 
-  put('M-A03', 'Sesi berakhir', { hideNav: true, showMetrics: false }, ({ body }) => {
+  put('M-A03', 'Sesi berakhir', { hideNav: true }, ({ body }) => {
     body.appendChild(banner('Sesi berakhir demi keamanan. Silakan masuk lagi.', C.warningSoft, C.warning));
     body.appendChild(cta('Masuk kembali', C.primary));
   });
@@ -68,17 +68,17 @@ export function generateMobileAttendance(page, positions) {
   };
 
   put('M-ATT01', 'Hub absensi', { tab: 'Absensi' }, ({ body }) => {
-    body.appendChild(sectionTitle('Absensi hari ini', 'Clock-in & clock-out — keduanya wajah + GPS'));
+    body.appendChild(sectionTitle('Absensi hari ini', 'Sudah clock-in · lanjut clock-out (wajah + GPS)'));
     body.appendChild(metricRow([
-      ['—', 'Masuk', C.ink500],
+      ['07:28', 'Masuk', C.success],
       ['—', 'Keluar', C.ink500],
     ]));
-    body.appendChild(cta('Clock-in', C.primary));
-    body.appendChild(secondaryCta('Clock-out'));
+    body.appendChild(cta('Clock-out', C.primary));
+    body.appendChild(wrapTxt('Clock-in dinonaktifkan sampai clock-out / hari berikutnya.', 12, 'Regular', C.ink500));
     body.appendChild(ghostCta('Lihat riwayat'));
   });
 
-  put('M-ATT02', 'Capture wajah', { hideNav: true, showMetrics: true }, ({ body }) => {
+  put('M-ATT02', 'Capture wajah', { hideNav: true }, ({ body }) => {
     body.appendChild(sectionTitle('Verifikasi wajah', 'Pastikan pencahayaan cukup'));
     body.appendChild(faceFrame('Tahan diam…'));
     body.appendChild(cta('Ambil foto', C.primary));
@@ -94,11 +94,13 @@ export function generateMobileAttendance(page, positions) {
   });
 
   put('M-ATT04', 'Absensi berhasil', { hideNav: true }, ({ body }) => {
-    body.appendChild(banner('Clock-in tersimpan', C.successSoft, C.success));
+    body.appendChild(banner('Absensi tersimpan', C.successSoft, C.success));
     body.appendChild(sectionTitle('07:28 WIB', 'Senin, 22 Sep 2026'));
+    body.appendChild(kvRow('Jenis', 'Clock-in'));
     body.appendChild(kvRow('Wajah', 'Cocok'));
     body.appendChild(kvRow('GPS', 'Dalam area · ±12m'));
     body.appendChild(kvRow('Lokasi', 'Site A'));
+    body.appendChild(wrapTxt('Frame yang sama dipakai untuk clock-out (ganti Jenis + jam).', 12, 'Regular', C.ink500));
     body.appendChild(cta('Kembali ke beranda', C.primary));
   });
 
@@ -147,11 +149,14 @@ export function generateMobileLeaveOtProfile(page, positions) {
   };
 
   put('M-LV01', 'Daftar izin/cuti', { tab: 'Pengajuan' }, ({ body }) => {
-    body.appendChild(sectionTitle('Izin & cuti', 'Pengajuan Anda'));
+    body.appendChild(sectionTitle('Pengajuan', 'Segment Izin | Lembur (satu tab)'));
+    const seg = softCard('Segment', C.primarySubtle);
+    seg.appendChild(txt('● Izin/Cuti     ○ Lembur', 13, 'SemiBold', C.primaryDark));
+    body.appendChild(seg);
     body.appendChild(cta('Ajukan baru', C.primary));
-    body.appendChild(listRow('Izin sakit', '22–23 Sep', pill('Pending', C.warningSoft, C.warning)));
-    body.appendChild(listRow('Cuti tahunan', '1–5 Agu', pill('Disetujui', C.successSoft, C.success)));
-    body.appendChild(listRow('Izin keluarga', '12 Jul', pill('Ditolak', C.errorSoft, C.error)));
+    body.appendChild(listRow('Sakit', '22–23 Sep', pill('Pending', C.warningSoft, C.warning)));
+    body.appendChild(listRow('Cuti', '1–5 Agu', pill('Disetujui', C.successSoft, C.success)));
+    body.appendChild(listRow('Izin lain', '12 Jul', pill('Ditolak', C.errorSoft, C.error)));
   });
 
   put('M-LV02', 'Form ajukan izin', { tab: 'Pengajuan', hideNav: true }, ({ body }) => {
@@ -165,10 +170,11 @@ export function generateMobileLeaveOtProfile(page, positions) {
 
   put('M-LV03', 'Detail pengajuan', { tab: 'Pengajuan' }, ({ body }) => {
     body.appendChild(pill('Pending', C.warningSoft, C.warning));
-    body.appendChild(sectionTitle('Izin sakit', '22–23 Sep 2026'));
+    body.appendChild(sectionTitle('Sakit', '22–23 Sep 2026'));
     body.appendChild(kvRow('Diajukan', '21 Sep · 18:02'));
     body.appendChild(kvRow('Supervisor', 'Andi Pratama'));
     body.appendChild(wrapTxt('Demam, istirahat di rumah.', 14, 'Regular', C.ink700));
+    body.appendChild(ghostCta('Batalkan pengajuan'));
   });
 
   put('M-LV04', 'Pengajuan terkirim', { hideNav: true }, ({ body }) => {

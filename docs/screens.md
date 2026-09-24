@@ -6,13 +6,13 @@ title: Screens & Pages
 # Screens & Pages
 
 :::info Status
-**Draft v0.1.3** — inventaris layar Mobile (M-\*) dan Web (W-\*). Implementasi: **React Native + Expo** (mobile) · **Vue 3** (web). Rule domain: [PRD §10](./prd#10-keputusan-domain-terkunci-mvp). Visual token: [Design System](./design-system).
+**Draft v0.1.4** — inventaris layar Mobile (M-\*) dan Web (W-\*). State ekstra (empty/RBAC/loading) = komponen FE, lihat [Design System §6.5](./design-system#65-state-tanpa-frame-ekstra-pragmatis). Rule domain: [PRD §10](./prd#10-keputusan-domain-terkunci-mvp).
 :::
 
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops |
-| Version | 0.1.3 |
+| Version | 0.1.4 |
 | Mobile IDs | **M-\*** (karyawan Operation) — RN / Expo |
 | Web IDs | **W-\*** (supervisor / HRD / admin) — Vue 3 |
 | Last updated | 2026-09-24 |
@@ -75,10 +75,10 @@ flowchart LR
 
 | ID | Layar | Catatan |
 |----|-------|---------|
-| M-ATT01 | Hub absensi | Clock-in **dan** clock-out entry (sama-sama face+GPS) |
+| M-ATT01 | Hub absensi | State pasca clock-in: **Clock-out** primer; clock-in disabled. FE toggle state pre/post |
 | M-ATT02 | Capture wajah | Kamera + guide oval (ATT-02); retry maks 3 |
-| M-ATT03 | Validasi lokasi | GPS + nama geofence; akurasi ≤ 50 m; radius default 100 m |
-| M-ATT04 | Absensi berhasil | Timestamp + ringkas validasi (in atau out) |
+| M-ATT03 | Validasi lokasi | GPS strip + placeholder peta; akurasi ≤ 50 m; radius default 100 m |
+| M-ATT04 | Absensi berhasil | Reuse untuk **clock-in & clock-out** (field Jenis) |
 | M-ATT05 | Gagal — wajah | Reason `FACE_MISMATCH` — **tanpa** override supervisor |
 | M-ATT06 | Gagal — GPS | Reason `OUT_OF_GEOFENCE` / akurasi rendah |
 | M-ATT07 | Riwayat absensi | List per periode |
@@ -88,9 +88,9 @@ flowchart LR
 
 | ID | Layar | Catatan |
 |----|-------|---------|
-| M-LV01 | Daftar pengajuan | Filter status |
-| M-LV02 | Form ajukan | Jenis enum **Sakit / Cuti / Izin lain**, tanggal, keterangan. Pending: batal saja |
-| M-LV03 | Detail pengajuan | Status + timeline approval (+ alasan tolak bila ada) |
+| M-LV01 | Daftar pengajuan | Segment **Izin \| Lembur** di tab Pengajuan |
+| M-LV02 | Form ajukan | Jenis enum **Sakit / Cuti / Izin lain**, tanggal, keterangan |
+| M-LV03 | Detail pengajuan | Status + timeline; **Batalkan** jika pending |
 | M-LV04 | Terkirim | Konfirmasi + notifikasi ke supervisor |
 
 ### 2.5 Lembur (`M-OT*`) — OT-01…02
@@ -120,7 +120,7 @@ flowchart LR
 |-----|----------------|
 | Beranda | M-H01 |
 | Absensi | M-ATT01 |
-| Pengajuan | M-LV01 (segment: Izin \| Lembur) |
+| Pengajuan | M-LV01 (segment: **Izin \| Lembur**) |
 | Profil | M-P01 |
 
 ---
@@ -140,8 +140,8 @@ flowchart LR
 | ID | Halaman | Persona | Catatan |
 |----|---------|---------|---------|
 | W-AP01 | Inbox persetujuan | Supervisor | Izin + lembur |
-| W-AP02 | Detail izin/cuti | Supervisor | Approve / reject — **alasan wajib saat tolak** (LV-02) |
-| W-AP03 | Detail lembur | Supervisor | Approve / reject — **alasan wajib saat tolak** (OT-02) |
+| W-AP02 | Detail izin/cuti | Supervisor | Approve / reject — alasan wajib; Tolak disabled sampai terisi |
+| W-AP03 | Detail lembur | Supervisor | Approve / reject — alasan wajib; Tolak disabled sampai terisi |
 
 ### 3.3 Kehadiran & laporan
 
@@ -224,3 +224,4 @@ Lihat README plugin untuk build & load di Figma.
 | 0.1.1 | 2026-09-24 | Prioritas P0 + M-A03/M-P01; urutan Status Contract/UI → Impl/API |
 | 0.1.2 | 2026-09-24 | Catatan implementasi: RN+Expo (mobile), Vue 3 (web) |
 | 0.1.3 | 2026-09-24 | Selaras PRD v0.2: clock-out, leave enum, reject reason, geofence 100m, Excel-first, W-H02 P0 |
+| 0.1.4 | 2026-09-24 | Hub pasca clock-in, batal leave, segment Izin\|Lembur; state ekstra tanpa frame baru |

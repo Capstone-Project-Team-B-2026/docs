@@ -114,3 +114,4 @@ git reset --soft HEAD~1   # batalkan commit terakhir (belum push), simpan peruba
 ## Referensi
 
 - [Dev Setup](./dev-setup) · [SDLC](./sdlc) · [Infrastructure](./infrastructure)
+- Project board otomasi: secret `PROJECT_TOKEN` di repo **docs** (lihat SDLC §2)

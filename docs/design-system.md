@@ -181,11 +181,24 @@ Gagal: tampilkan alasan + CTA “Coba lagi” (maks 3); jangan silent fail; **ta
 
 ### 6.3 Approval reject
 
-Di web `W-AP02` / `W-AP03`: aksi Tolak menampilkan field **Alasan penolakan** (wajib) sebelum konfirmasi.
+Di web `W-AP02` / `W-AP03`: field **Alasan penolakan** wajib sebelum Tolak aktif (disable tombol sampai terisi).
 
 ### 6.4 Web shell
 
 Sidebar 240px + top bar (periode, role, avatar) + main content max-width nyaman untuk tabel.
+
+### 6.5 State tanpa frame ekstra (pragmatis)
+
+Agar slicing tidak menambah layar:
+
+| Kebutuhan | Solusi |
+|-----------|--------|
+| Empty / loading / GPS-permission denied | Komponen shared di kode (`EmptyState`, spinner); **tidak** digambar sebagai M-*/W-* terpisah |
+| Clock-out sukses | Reuse `M-ATT04` — ganti field Jenis + jam |
+| Hub sebelum clock-in | FE toggle dari state `M-ATT01` (Figma menampilkan state pasca clock-in) |
+| RBAC ditolak | Route guard → redirect + toast; **bukan** halaman penuh |
+| Peta geofence | Placeholder di Figma; implementasi map SDK di mobile tanpa frame baru |
+| Segment Izin \| Lembur | Kontrol di `M-LV01` / tab Pengajuan (bukan dua tab bar) |
 
 ---
 
@@ -238,3 +251,4 @@ Durasi tipikal 150–250ms; easing standard, bukan bounce berlebihan.
 | 0.1.0 | 2026-09-22 | Draft awal dari proposal & PRD Kelompok B |
 | 0.1.1 | 2026-09-24 | Catatan permukaan: RN/Expo (mobile), Vue 3 (web) |
 | 0.1.2 | 2026-09-24 | Pola clock-out + reject reason wajib; selaras PRD v0.2 |
+| 0.1.3 | 2026-09-24 | State pragmatis tanpa frame ekstra; metrik hanya di board PRD |

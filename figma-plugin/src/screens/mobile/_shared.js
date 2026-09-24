@@ -1,11 +1,10 @@
 import { C, primaryGradient, headerShadow, paint } from '../../tokens.js';
 import { box, stretch, txt, wrapTxt, row, col, space, fixCollapsedText } from '../../ui/layout.js';
 import {
-  card, cta, ghostCta, secondaryCta, pill, progress, metricRow, metricGrid, listRow,
+  card, cta, ghostCta, secondaryCta, pill, progress, metricRow, listRow,
   softCard, inputField, kvRow, banner, sectionTitle,
 } from '../../ui/primitives.js';
 import { phoneShell, bottomNav, statusRow, appHeader, scrollBody, footerCtas } from '../../ui/device.js';
-import { metricsFor } from '../../catalog/metrics.js';
 
 export function buildMobile(page, x, y, id, title, opts, build) {
   const o = opts || {};
@@ -21,15 +20,7 @@ export function buildMobile(page, x, y, id, title, opts, build) {
   const body = scrollBody('Body');
   phone.appendChild(body);
 
-  const mets = metricsFor(id);
-  if (mets.length && o.showMetrics !== false) {
-    const strip = softCard('ScreenMetrics', C.primarySubtle);
-    strip.itemSpacing = 8;
-    strip.appendChild(txt('Metrik layar', 12, 'SemiBold', C.primaryDark));
-    strip.appendChild(metricGrid(mets, 2));
-    body.appendChild(strip);
-  }
-
+  // Do NOT inject planning metrics inside the device — keeps Figma frames slice-ready.
   build({ phone, body, wrap, opts: o });
 
   if (!o.hideNav) {
@@ -83,7 +74,7 @@ export function gpsStrip(ok, name, accuracy) {
 
 export {
   C, paint, box, stretch, txt, wrapTxt, row, col, space,
-  card, cta, ghostCta, secondaryCta, pill, progress, metricRow, metricGrid, listRow,
+  card, cta, ghostCta, secondaryCta, pill, progress, metricRow, listRow,
   softCard, inputField, kvRow, banner, sectionTitle,
   phoneShell, bottomNav, statusRow, appHeader, scrollBody, footerCtas,
 };

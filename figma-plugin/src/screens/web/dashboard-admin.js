@@ -2,10 +2,9 @@ import { C, paint } from '../../tokens.js';
 import { txt, wrapTxt, stretch, fixCollapsedText, col, row } from '../../ui/layout.js';
 import {
   card, cta, ghostCta, secondaryCta, pill, listRow, softCard, inputField,
-  kvRow, banner, sectionTitle, metricRow, metricGrid,
+  kvRow, banner, sectionTitle, metricRow,
 } from '../../ui/primitives.js';
 import { webShell } from '../../ui/web-shell.js';
-import { metricsFor } from '../../catalog/metrics.js';
 
 function last(node) {
   return node.children[node.children.length - 1];
@@ -15,15 +14,7 @@ function buildWeb(page, id, title, activeNav, chrome, build) {
   const { wrap, content } = webShell(id, title, 0, 0, activeNav, chrome);
   page.appendChild(wrap);
 
-  const mets = metricsFor(id);
-  if (mets.length && chrome !== 'none') {
-    const strip = softCard('ScreenMetrics', C.primarySubtle);
-    strip.itemSpacing = 8;
-    strip.appendChild(txt('Metrik halaman', 12, 'SemiBold', C.primaryDark));
-    strip.appendChild(metricGrid(mets, 2));
-    content.appendChild(strip);
-  }
-
+  // Do NOT inject planning metrics inside the page chrome — keeps frames slice-ready.
   build({ content, wrap });
   fixCollapsedText(wrap);
   return wrap;
@@ -74,6 +65,7 @@ export function generateWebAll(page, positions) {
     content.appendChild(wrapTxt('Demam, istirahat di rumah.', 14, 'Regular', C.ink700));
     content.appendChild(kvRow('Diajukan', '21 Sep · 18:02'));
     content.appendChild(inputField('Alasan penolakan (wajib jika tolak)', 'Contoh: overlapping absensi'));
+    content.appendChild(wrapTxt('Tolak disabled sampai alasan terisi (validasi FE).', 12, 'Regular', C.ink500));
     const actions = row('Actions', 12);
     stretch(actions);
     const a = cta('Setujui', C.success);
