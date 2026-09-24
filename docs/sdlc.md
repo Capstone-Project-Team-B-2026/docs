@@ -186,9 +186,9 @@ Item siap dikerjakan jika:
 
 ### 5.4 Disiplin kontrak OpenAPI
 
-1. Backend generate `openapi.json`; bump **`info.version`** setiap perubahan path/schema.
-2. Salin ke **`docs/static/openapi.json`** (URL publik Pages) + release asset.
-3. Web/mobile CI: `npm run api:sync` lalu `git diff --exit-code openapi/ src/api/` — drift **gagal**.
+1. Backend generate & commit `openapi.json`; bump **`info.version`** setiap perubahan path/schema.
+2. Setelah merge ke **`main`**, job Deploy backend menulis mirror publik `docs/static/openapi.json` (bukan CI anti-drift di FE).
+3. Web/mobile: `npm run api:sync` saat mulai kerja / setelah contract di main — commit hasil Orval di PR klien.
 
 ### 5.5 Estimate di board
 

@@ -394,21 +394,22 @@ erDiagram
 
 ### Disiplin kontrak OpenAPI (terkunci)
 
-1. Backend generate `openapi.json` dari Zod; **`info.version` wajib naik** setiap perubahan path/schema.
-2. Publish: release asset backend **dan** mirror publik [`docs/static/openapi.json`](https://github.com/Capstone-Project-Team-B-2026/docs/blob/main/static/openapi.json).
-   - Otomatis: workflow docs [`sync-openapi.yml`](https://github.com/Capstone-Project-Team-B-2026/docs/blob/main/.github/workflows/sync-openapi.yml) (cron 6 jam + `repository_dispatch` `openapi-updated` dari backend CI).
-   - Secret: `PROJECT_TOKEN` di repo **docs** (dan opsional di **backend** untuk dispatch setelah push `main`).
-3. Web/mobile: `npm run api:sync` (default curl mirror publik, tanpa PAT) → Orval. Job CI: sync + generate lalu `git diff --exit-code openapi/ src/api/` — klien basi **gagal CI**.
-4. Design tokens: `docs/static/tokens.json` → `npm run tokens:sync` di web (`src/styles/tokens.ts`) / mobile (`src/theme/tokens.ts`).
+1. Backend generate `openapi.json` dari Zod; **`info.version` wajib naik** setiap perubahan path/schema; file di-commit di repo backend.
+2. **Publish mirror publik** hanya dari **Deploy backend** setelah push ke `main`:
+   - Job `publish-openapi` di [`backend/.github/workflows/deploy.yml`](https://github.com/Capstone-Project-Team-B-2026/backend/blob/main/.github/workflows/deploy.yml) menulis [`docs/static/openapi.json`](https://github.com/Capstone-Project-Team-B-2026/docs/blob/main/static/openapi.json).
+   - Secret backend: `PROJECT_TOKEN` (PAT `contents:write` pada repo docs).
+   - Kontrak yang “hidup” = yang ada di `main` backend — tidak ada anti-drift CI di web/mobile.
+3. Web/mobile: saat mulai kerja / setelah contract merge ke main → `npm run api:sync` (curl mirror publik, tanpa PAT) → Orval. Commit hasil generate di PR FE.
+4. Design tokens: `docs/static/tokens.json` → `npm run tokens:sync` di web / mobile.
 
 ### Pipeline
 
 | Repo | CI | Deploy / artefak |
 |------|----|------------------|
-| **Backend** | format · lint · tsc · unit coverage ≥95% · **integration** (postgres service + `drizzle-kit push` + `app.request`) | `main` → Worker dev · `v*` → prod |
-| **Web** | format · lint · tsc · unit ≥95% (`src/lib`) · **OpenAPI anti-drift** · **E2E Playwright smoke** | Pages `dev-nexus-ops-web` / `nexus-ops-web` |
-| **Mobile** | format · lint · tsc · unit ≥95% (`src/lib`) · **OpenAPI anti-drift** | APK artifact; **Maestro = gate manual** (bukan CI) |
-| **Docs** | Docusaurus build · `project-sprint-backlog.yml` · **`sync-openapi.yml`** | GitHub Pages |
+| **Backend** | format · lint · tsc · unit coverage ≥95% | `main` → Worker dev + **publish OpenAPI → docs** · `v*` → prod |
+| **Web** | format · lint · tsc · unit ≥95% (`src/lib`) · **E2E Playwright smoke** | Pages `dev-nexus-ops-web` / `nexus-ops-web` |
+| **Mobile** | format · lint · tsc · unit ≥95% (`src/lib`) | APK artifact; **Maestro = gate manual** (bukan CI) |
+| **Docs** | Docusaurus build · `project-sprint-backlog.yml` | GitHub Pages · `static/openapi.json` diisi oleh backend deploy |
 
 ```mermaid
 flowchart TB
@@ -477,7 +478,7 @@ flowchart TB
 | D-08 | Auth token | **Dipilih** | JWT Bearer · expiry 12h |
 | D-09 | Retensi foto wajah | **Dipilih** | **Tidak ada foto** — embedding only di DB |
 | D-10 | Package managers | **Dipilih** | Bun (backend, docs) · npm (web, mobile) |
-| D-11 | OpenAPI → klien | **Dipilih** | Version bump wajib · publish ke docs static · CI anti-drift |
+| D-11 | OpenAPI → klien | **Dipilih** | Commit di backend · publish ke docs/static **dari Deploy main** · FE `api:sync` manual |
 | D-12 | Push notification | **Dipilih** | FCM HTTP v1 + in-app feed + outbox |
 | D-13 | Timezone | **Dipilih** | `Asia/Jakarta` · `work_date` lokal · timestamptz UTC |
 | D-14 | Atomic writes | **Dipilih** | `db.batch()` + DB invariants + notification outbox |
