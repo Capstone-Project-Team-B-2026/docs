@@ -522,7 +522,7 @@ Selaras [SDLC §4](./sdlc).
 | 0.2.1 | 2026-09-24 | Rencana infra per sprint 1 minggu |
 | 0.3.0 | 2026-09-24 | Klien terkunci: Vue Pages + RN Expo |
 | 0.3.1 | 2026-09-24 | ADR D-06 R2 + D-12 FCM |
-| 1.0.0 | 2026-09-24 | **Locked:** D-05 face on-device, D-09 embedding-only, ERD v1, timezone, batch/outbox, CORS, OpenAPI anti-drift, R2=reports |
+| 1.0.0 | 2026-09-24 | **Locked:** D-05 face on-device, D-09 embedding-only, ERD v1, timezone, batch/outbox, CORS, OpenAPI publish dari Deploy, R2=reports |
 
 ---
 

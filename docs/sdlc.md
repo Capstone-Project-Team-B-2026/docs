@@ -97,7 +97,7 @@ Prinsip kerja:
 |---------|---------|---------|
 | Unit / service | Domain & use case backend | Coverage **≥ 95%** (exclude handler/persistence per `bunfig.toml`) |
 | Unit FE | `src/lib` + composable/hooks/store | Coverage **≥ 95%** pada path itu; komponen UI = component test terpisah (bukan gate 95% global) |
-| Kontrak API | OpenAPI + Zod | **`info.version` bump** wajib; CI anti-drift di web/mobile |
+| Kontrak API | OpenAPI + Zod | **`info.version` bump** wajib; mirror docs diisi Deploy backend `main` |
 | Integrasi BE | Modul + Postgres | Service `postgres` di CI · `drizzle-kit push` · seed · assert `app.request()` · script `test:integration` · job terpisah dari unit |
 | E2E web | Playwright | Job CI: `playwright install --with-deps chromium`; **API di-mock** lewat `page.route` (suite default tanpa secret `E2E_*`; tag `@live` opsional) |
 | E2E mobile | Maestro | **Gate manual** vs APK debug (owner Atin + assignee card); **bukan** CI — emulator terlalu lambat/flaky |
@@ -274,7 +274,7 @@ Risiko produk: [PRD §12](./prd).
 |-------|---------|-----------|
 | 0.1.0 | 2026-09-23 | Draft awal SDLC |
 | 0.1.1–0.1.6 | 2026-09-24 | Sprint 1 minggu, paralel, FCM/R2, automation, rebalance |
-| 1.0.0 | 2026-09-24 | **Locked:** DoR testID/contract, coverage scope, Playwright CI + Maestro manual, OpenAPI anti-drift, Estimate field |
+| 1.0.0 | 2026-09-24 | **Locked:** DoR testID/contract, coverage scope, Playwright CI + Maestro manual, OpenAPI via Deploy publish, Estimate field |
 
 ---
 
