@@ -6,13 +6,13 @@ title: Design System
 # Nexus Ops Design System
 
 :::info Status
-**Draft v0.1.2** — token & komponen untuk mobile Android (**React Native / Expo**) dan web dashboard (**Vue 3**). Selaras dengan [PRD §10](./prd#10-keputusan-domain-terkunci-mvp) dan [Screens](./screens).
+**Locked v1.0** — token, komponen, pola UI, dan registry `testID` terkunci. Selaras [PRD §10](./prd#10-keputusan-domain-terkunci-mvp) dan [Screens](./screens).
 :::
 
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Absensi Divisi Operation |
-| Version | 0.1.2 |
+| Version | 1.0.0 |
 | Surfaces | Mobile (390×844) · Web dashboard (1280+) |
 | Last updated | 2026-09-24 |
 
@@ -78,16 +78,17 @@ Palette **slate-navy + cyan live** — profesional untuk operasi lapangan, bukan
 
 ### 2.4 Status absensi (domain)
 
-| Status | Warna | Label |
-|--------|-------|-------|
-| Belum clock-in | `ink500` + `ink100` | Belum absen |
-| Hadir (valid) | `success` | Hadir |
-| Terlambat | `warning` | Terlambat |
-| Di luar area | `error` | GPS ditolak |
-| Wajah tidak cocok | `error` | Face ditolak |
-| Izin / cuti | `info` | Izin |
-| Lembur pending | `warning` | Menunggu |
-| Lembur approved | `success` | Disetujui |
+| Status API | Warna | Label UI |
+|------------|-------|----------|
+| (belum baris) | `ink500` + `ink100` | Belum absen |
+| `present` | `success` | Hadir |
+| `late` | `warning` | Terlambat |
+| `absent` | `error` | Alpha |
+| `leave` | `info` | Izin |
+| GPS ditolak | `error` | GPS ditolak |
+| Face ditolak | `error` | Face ditolak |
+| `pending` (request) | `warning` | Menunggu |
+| `approved` | `success` | Disetujui |
 
 ---
 
@@ -138,7 +139,7 @@ Header brand: soft navy shadow, bukan glow.
 ### 5.2 Input & form
 
 - Label di atas field; helper di bawah
-- Error inline merah + reason code bila dari API (`FACE_MISMATCH`, `OUT_OF_GEOFENCE`)
+- Error inline merah + **reason code** dari API (lihat [PRD §10.6](./prd#106-reason-code--enum))
 - Tanggal/jam leave & OT memakai picker native platform
 
 ### 5.3 Status chip / pill
@@ -163,6 +164,18 @@ Angka besar + label untuk dashboard (Hadir, Terlambat, Belum absen, On leave).
 **Mobile tab bar (4):** Beranda · Absensi · Pengajuan · Profil  
 **Web sidebar:** Ringkasan · Kehadiran · Persetujuan · Laporan · Karyawan · Lokasi · Pengaturan
 
+### 5.8 Props minimum (komponen FE bersama)
+
+Agar web Vue dan mobile RN tidak divergen:
+
+| Komponen | Props / slots minimum |
+|----------|------------------------|
+| **DataTable** (W-T01, W-R02) | `columns[]`, `rows[]`, `loading`, `emptyText`, `onRowClick?`, `filters?` |
+| **DateRangePicker** (W-R01, M-LV02) | `start`, `end`, `onChange`, `maxRangeDays?`, `disabled?` |
+| **Toast / Banner** | `variant: success\|warning\|error\|info`, `title`, `message?`, `actionLabel?`, `onAction?`, `durationMs?` |
+| **Skeleton** | `variant: text\|row\|card\|metric`, `count?` |
+| **EmptyState** | `title`, `description?`, `ctaLabel?`, `onCta?` |
+
 ---
 
 ## 6. Pola layar
@@ -175,7 +188,7 @@ Angka besar + label untuk dashboard (Hadir, Terlambat, Belum absen, On leave).
 
 ### 6.2 Clock-in / clock-out flow
 
-1. Hub absensi (pilih **Clock-in** atau **Clock-out**) → 2. Capture wajah → 3. Validasi GPS → 4. Sukses / gagal dengan reason
+1. Hub absensi (pilih **Clock-in** atau **Clock-out**) → 2. Capture wajah (on-device embedding) → 3. Validasi GPS → 4. Sukses / gagal dengan reason
 
 Gagal: tampilkan alasan + CTA “Coba lagi” (maks 3); jangan silent fail; **tanpa** tombol override supervisor.
 
@@ -189,11 +202,9 @@ Sidebar 240px + top bar (periode, role, avatar) + main content max-width nyaman 
 
 ### 6.5 State tanpa frame ekstra (pragmatis)
 
-Agar slicing tidak menambah layar:
-
 | Kebutuhan | Solusi |
 |-----------|--------|
-| Empty / loading / GPS-permission denied | Komponen shared di kode (`EmptyState`, spinner); **tidak** digambar sebagai M-*/W-* terpisah |
+| Empty / loading / GPS-permission denied | Komponen shared (`EmptyState`, spinner); **tidak** digambar sebagai M-*/W-* terpisah |
 | Clock-out sukses | Reuse `M-ATT04` — ganti field Jenis + jam |
 | Hub sebelum clock-in | FE toggle dari state `M-ATT01` (Figma menampilkan state pasca clock-in) |
 | RBAC ditolak | Route guard → redirect + toast; **bukan** halaman penuh |
@@ -202,7 +213,29 @@ Agar slicing tidak menambah layar:
 
 ---
 
-## 7. Ikonografi & ilustrasi
+## 7. Registry testID / data-testid
+
+Wajib untuk DoD UI dan card E2E. Web: `data-testid`; Mobile: `testID`.
+
+| Screen / area | ID wajib |
+|---------------|----------|
+| Web shell smoke | `web-shell`, `web-brand` |
+| W-A01 login | `login-identifier`, `login-password`, `login-submit`, `dashboard-shell` |
+| W-AP01 inbox | `approvals-inbox` |
+| W-AP02/03 reject | `reject-reason`, `reject-submit` |
+| W-R01 hub | `reports-hub` |
+| W-R03 export | `export-excel` |
+| Mobile shell smoke | `mobile-shell`, `mobile-brand` |
+| M-A02 login | `login-identifier`, `login-password`, `login-submit`, `home-shell` |
+| M-H01 / clock | `home-shell`, `cta-clock-in` |
+| M-ATT* flow | `attendance-hub`, `start-clock-in`, `face-capture`, `attendance-success` |
+| M-LV* | `tab-pengajuan`, `leave-list`, `leave-create`, `leave-type-cuti`, `leave-submit`, `leave-sent` |
+
+Unskip spek Playwright/Maestro setelah ID di atas terpasang di layar terkait.
+
+---
+
+## 8. Ikonografi & ilustrasi
 
 - Ikon line sederhana (kehadiran, lokasi, wajah, dokumen, lonceng)
 - Hindari ilustrasi mascot; produk ops memakai **ikon status + foto profil**
@@ -210,7 +243,7 @@ Agar slicing tidak menambah layar:
 
 ---
 
-## 8. Motion (ringkas)
+## 9. Motion (ringkas)
 
 | Momen | Motion |
 |-------|--------|
@@ -223,7 +256,7 @@ Durasi tipikal 150–250ms; easing standard, bukan bounce berlebihan.
 
 ---
 
-## 9. Do / Don’t
+## 10. Do / Don’t
 
 | Do | Don’t |
 |----|-------|
@@ -234,21 +267,27 @@ Durasi tipikal 150–250ms; easing standard, bukan bounce berlebihan.
 
 ---
 
-## 10. Mapping ke kode & Figma
+## 11. Mapping ke kode & Figma
 
 | Artefak | Lokasi |
 |---------|--------|
-| Token JS (plugin) | `figma-plugin/src/tokens.js` |
+| Token JS (plugin) | `figma-plugin/src/tokens.js` — **sumber tunggal** |
+| Token JSON publik | `docs/static/tokens.json` (di-generate dari plugin tokens) |
+| Vendor web | `web/src/styles/tokens.ts` (salin dari static; pola seperti OpenAPI) |
+| Vendor mobile | `mobile/src/theme/tokens.ts` |
 | Screen IDs | [Screens](./screens) · `figma-plugin/src/catalog/ids.js` |
 | Generator Figma | Plugin **Nexus Ops Design Generator** di `figma-plugin/` |
 
+Generate: dari root docs, `node figma-plugin/scripts/export-tokens.mjs` (atau `npm run tokens:export` di plugin) → tulis `static/tokens.json`. FE menjalankan sync manual / script mirror saat mulai sprint UI.
+
 ---
 
-## 11. Riwayat revisi
+## 12. Riwayat revisi
 
 | Versi | Tanggal | Perubahan |
 |-------|---------|-----------|
 | 0.1.0 | 2026-09-22 | Draft awal dari proposal & PRD Kelompok B |
 | 0.1.1 | 2026-09-24 | Catatan permukaan: RN/Expo (mobile), Vue 3 (web) |
-| 0.1.2 | 2026-09-24 | Pola clock-out + reject reason wajib; selaras PRD v0.2 |
-| 0.1.3 | 2026-09-24 | State pragmatis tanpa frame ekstra; metrik hanya di board PRD |
+| 0.1.2 | 2026-09-24 | Pola clock-out + reject reason wajib |
+| 0.1.3 | 2026-09-24 | State pragmatis tanpa frame ekstra |
+| 1.0.0 | 2026-09-24 | **Locked:** testID registry, props minimum, token vendoring, status API labels |

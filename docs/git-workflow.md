@@ -6,12 +6,12 @@ title: Git Workflow
 # Git Workflow (Tim)
 
 :::info Status
-**Draft v0.3** — cara kerja Git sehari-hari. Ringkasan proses: [SDLC §6](./sdlc#6-alur-kerja-git--quality-gate). Setup tool: [Dev Setup](./dev-setup).
+**Living** — cara kerja Git sehari-hari. Ringkasan proses: [SDLC §6](./sdlc#6-alur-kerja-git--quality-gate). Setup tool: [Dev Setup](./dev-setup).
 :::
 
 | Field | Value |
 |-------|-------|
-| Version | 0.3.0 |
+| Version | 0.3.1 |
 | Last updated | 2026-09-24 |
 
 ---

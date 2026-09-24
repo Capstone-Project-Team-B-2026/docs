@@ -1,0 +1,659 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Nexus Ops API",
+    "version": "0.1.0",
+    "description": "Absensi Divisi Operation — OpenAPI di-generate otomatis dari Zod schemas (@hono/zod-openapi)."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local"
+    },
+    {
+      "url": "https://dev-nexus-ops-api.dev-akmal69.workers.dev",
+      "description": "Development"
+    },
+    {
+      "url": "https://nexus-ops-api.dev-akmal69.workers.dev",
+      "description": "Production"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok"
+            ]
+          },
+          "service": {
+            "type": "string"
+          },
+          "env": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "status",
+          "service",
+          "env",
+          "time"
+        ]
+      },
+      "PublicUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "employee",
+              "supervisor",
+              "hrd"
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "fullName",
+          "role",
+          "isActive"
+        ]
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "tokenType": {
+            "type": "string",
+            "enum": [
+              "Bearer"
+            ]
+          },
+          "expiresIn": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/PublicUser"
+          }
+        },
+        "required": [
+          "accessToken",
+          "tokenType",
+          "expiresIn",
+          "user"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "example": "UNAUTHORIZED"
+              },
+              "message": {
+                "type": "string",
+                "example": "Invalid email or password"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "budi@operation.local"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "example": "password123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "MeResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/PublicUser"
+          }
+        },
+        "required": [
+          "user"
+        ]
+      },
+      "DashboardMetrics": {
+        "type": "object",
+        "properties": {
+          "present": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Hadir",
+            "example": 42
+          },
+          "late": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Terlambat",
+            "example": 3
+          },
+          "notYet": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Belum absen",
+            "example": 5
+          },
+          "onLeave": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Izin",
+            "example": 2
+          }
+        },
+        "required": [
+          "present",
+          "late",
+          "notYet",
+          "onLeave"
+        ]
+      },
+      "LiveAttendanceStatus": {
+        "type": "string",
+        "enum": [
+          "present",
+          "late",
+          "not_yet",
+          "on_leave"
+        ]
+      },
+      "DashboardActivityItem": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "Budi Santoso"
+          },
+          "status": {
+            "$ref": "#/components/schemas/LiveAttendanceStatus"
+          },
+          "detail": {
+            "type": "string",
+            "example": "Clock-in 07:28 · Site A"
+          },
+          "occurredAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "userId",
+          "fullName",
+          "status",
+          "detail",
+          "occurredAt"
+        ]
+      },
+      "DashboardSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-22"
+          },
+          "siteId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "shiftId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "shiftLabel": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "Shift pagi"
+          },
+          "sitesLabel": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "Site A & B"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/DashboardMetrics"
+          },
+          "recentActivity": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DashboardActivityItem"
+            }
+          }
+        },
+        "required": [
+          "date",
+          "siteId",
+          "shiftId",
+          "shiftLabel",
+          "sitesLabel",
+          "metrics",
+          "recentActivity"
+        ]
+      },
+      "LiveNotYetItem": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "Citra Lestari"
+          },
+          "siteName": {
+            "type": "string",
+            "example": "Site A"
+          },
+          "targetClockIn": {
+            "type": "string",
+            "example": "07:30"
+          }
+        },
+        "required": [
+          "userId",
+          "fullName",
+          "siteName",
+          "targetClockIn"
+        ]
+      },
+      "DashboardLiveResponse": {
+        "type": "object",
+        "properties": {
+          "refreshedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-22"
+          },
+          "siteId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "shiftId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "shift": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": "string",
+                "example": "Shift Pagi"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          },
+          "notYetCount": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 5
+          },
+          "notYet": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LiveNotYetItem"
+            }
+          }
+        },
+        "required": [
+          "refreshedAt",
+          "date",
+          "siteId",
+          "shiftId",
+          "shift",
+          "notYetCount",
+          "notYet"
+        ]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Login karyawan / supervisor / HRD",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login sukses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kredensial salah",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Profil user terautentikasi",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profil user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/dashboard/summary": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Ringkasan operasional harian (W-D01)",
+        "description": "Contract stub (S2). AuthZ: `supervisor` | `hrd`. Metrics: Hadir / Terlambat / Belum absen / Izin + recent activity. Optional filters: siteId, shiftId. Implementation: see backend#4.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+            },
+            "required": false,
+            "name": "siteId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
+            },
+            "required": false,
+            "name": "shiftId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ringkasan dashboard",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardSummaryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role tidak diizinkan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Contract only — use-case belum diimplementasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/dashboard/live": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Kehadiran live — belum absen (W-D02)",
+        "description": "Contract stub (S2). AuthZ: `supervisor` | `hrd`. Lists employees who have not clocked in for the selected shift/site. Reuse attendance projections — not a separate live table. Implementation: see backend#4.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+            },
+            "required": false,
+            "name": "siteId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
+            },
+            "required": false,
+            "name": "shiftId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar belum absen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardLiveResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role tidak diizinkan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Contract only — use-case belum diimplementasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}

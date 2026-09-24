@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Promote [Contract]/[UI]/[Test] items whose sprint has started: Icebox → Backlog.
+# Also strip GitHub label "Icebox" so Status field is the single source of truth.
 set -euo pipefail
 
 ORG="${ORG:-Capstone-Project-Team-B-2026}"
@@ -53,8 +54,10 @@ echo "$META" | jq -r --arg today "$TODAY" '
 
 CURSOR=""
 PROMOTED=0
+LABELS_STRIPPED=0
 SCANNED=0
 : > /tmp/to_promote.txt
+: > /tmp/strip_labels.txt
 
 while true; do
   if [ -z "$CURSOR" ]; then
@@ -80,7 +83,12 @@ query($org:String!, $n:Int!) {
             }
           }
           content {
-            ... on Issue { title }
+            ... on Issue {
+              title
+              number
+              repository { nameWithOwner }
+              labels(first:20) { nodes { name } }
+            }
             ... on DraftIssue { title }
           }
         }
@@ -111,7 +119,12 @@ query($org:String!, $n:Int!, $c:String!) {
             }
           }
           content {
-            ... on Issue { title }
+            ... on Issue {
+              title
+              number
+              repository { nameWithOwner }
+              labels(first:20) { nodes { name } }
+            }
             ... on DraftIssue { title }
           }
         }
@@ -130,9 +143,10 @@ info = page["data"]["organization"]["projectV2"]["items"]["pageInfo"]
 open("/tmp/scanned.txt", "w").write(str(len(items)))
 open("/tmp/has_next.txt", "w").write("1" if info["hasNextPage"] else "0")
 open("/tmp/cursor.txt", "w").write(info.get("endCursor") or "")
-with open("/tmp/to_promote.txt", "a") as out:
+with open("/tmp/to_promote.txt", "a") as out, open("/tmp/strip_labels.txt", "a") as strip:
     for it in items:
-        title = ((it.get("content") or {}).get("title")) or ""
+        content = it.get("content") or {}
+        title = content.get("title") or ""
         status = None
         sprint_id = None
         for fv in it.get("fieldValues", {}).get("nodes") or []:
@@ -143,8 +157,15 @@ with open("/tmp/to_promote.txt", "a") as out:
                 status = fv["name"]
             if fname == "Sprint" and "iterationId" in fv:
                 sprint_id = fv["iterationId"]
+        labels = [n["name"] for n in (content.get("labels") or {}).get("nodes") or []]
+        repo = (content.get("repository") or {}).get("nameWithOwner")
+        number = content.get("number")
+        if repo and number and "Icebox" in labels and status in ("Backlog", "In progress", "In review", "Done", "Ready"):
+            strip.write(f"{repo}\t{number}\n")
         if status == "Icebox" and sprint_id in due and re.match(r"^\[(Contract|UI|Test)\]", title):
             out.write(it["id"] + "\n")
+            if repo and number and "Icebox" in labels:
+                strip.write(f"{repo}\t{number}\n")
 PY
 
   SCANNED=$((SCANNED + $(cat /tmp/scanned.txt)))
@@ -174,5 +195,15 @@ mutation($project:ID!, $item:ID!, $field:ID!, $option:String!) {
   echo "Promoted $ITEM_ID -> Backlog"
 done < /tmp/to_promote.txt
 
+sort -u /tmp/strip_labels.txt -o /tmp/strip_labels.txt
+while IFS=$'\t' read -r REPO NUM; do
+  [ -z "${REPO:-}" ] && continue
+  if gh api -X DELETE "repos/${REPO}/issues/${NUM}/labels/Icebox" >/dev/null 2>&1; then
+    LABELS_STRIPPED=$((LABELS_STRIPPED + 1))
+    echo "Removed Icebox label from ${REPO}#${NUM}"
+  fi
+done < /tmp/strip_labels.txt
+
 echo "Scanned nodes: $SCANNED"
 echo "Promoted to Backlog: $PROMOTED"
+echo "Icebox labels stripped: $LABELS_STRIPPED"

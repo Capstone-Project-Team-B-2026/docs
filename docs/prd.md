@@ -6,13 +6,13 @@ title: Product Requirements Document (PRD)
 # Product Requirements Document (PRD)
 
 :::info Status
-**v0.2.1 — Keputusan domain terkunci (2026-09-24)** untuk MVP semester ini. Wawancara lapangan boleh menambah *catatan*, tetapi perubahan rule di bawah memerlukan update PRD + persetujuan Project Leader.
+**Locked v1.0** — keputusan domain, NFR, state machine, enum, dan face runtime terkunci untuk MVP. Perubahan rule memerlukan update PRD + persetujuan Project Leader.
 :::
 
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.2.1 |
+| Version | 1.0.0 |
 | Mata Kuliah | STSI4440 |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
 | Last updated | 2026-09-24 |
@@ -44,16 +44,16 @@ Satu platform absensi yang akurat, aman, dan terpantau secara real-time — dari
 3. Mengintegrasikan izin, cuti, dan lembur dalam satu platform.
 4. Menyediakan dashboard interaktif dan pelaporan otomatis bagi manajemen.
 
-### Tujuan keberhasilan (draft success metrics)
+### Tujuan keberhasilan (success metrics — terkunci)
 
-| Metrik | Target draft | Catatan |
-|--------|--------------|---------|
+| Metrik | Target | Catatan |
+|--------|--------|---------|
 | Accuracy clock-in valid | ≥ 95% kehadiran tervalidasi wajah + GPS | Diukur pada UAT |
-| Waktu rekap laporan | &lt; 5 menit generate PDF/Excel | Vs proses manual |
+| Waktu rekap laporan | &lt; 5 menit generate Excel (PDF opsional) | Vs proses manual |
 | Adoption UAT | ≥ 80% skenario utama lulus | Karyawan + supervisor + HRD |
 | Latency notifikasi | &lt; 1 menit setelah event | Status izin/cuti, pengingat |
 
-*Metrik di atas dipakai sebagai target UAT; rule domain pendukung ada di [§10](#10-keputusan-domain-terkunci-mvp).*
+*Rule domain pendukung: [§10](#10-keputusan-domain-terkunci-mvp).*
 
 ---
 
@@ -133,7 +133,7 @@ Prioritas: **P0** = harus ada di MVP · **P1** = penting · **P2** = nice-to-hav
 | ATT-03 | Sebagai sistem, saya memvalidasi lokasi berada dalam area geofence yang diizinkan. | P0 |
 | ATT-04 | Sebagai karyawan, saya melihat status absensi hari ini (sudah/belum clock-in, jam masuk/keluar). | P0 |
 | ATT-05 | Sebagai sistem, saya mencatat timestamp, lokasi, dan hasil validasi untuk audit. | P0 |
-| ATT-06 | Sebagai supervisor, saya melihat daftar karyawan yang belum absen pada shift berjalan. | P1 |
+| ATT-06 | Sebagai supervisor, saya melihat daftar karyawan yang belum absen pada shift berjalan. **Definisi:** karyawan `is_active` yang belum punya baris `attendance_records` untuk `work_date` hari ini (Asia/Jakarta). | P1 |
 
 ### 5.3 Izin & cuti
 
@@ -171,17 +171,17 @@ Prioritas: **P0** = harus ada di MVP · **P1** = penting · **P2** = nice-to-hav
 
 ---
 
-## 6. Requirements non-fungsional (draft)
+## 6. Requirements non-fungsional (terkunci)
 
-| Kategori | Requirement | Target draft |
-|----------|-------------|--------------|
-| **Keamanan** | Autentikasi token; data wajah & lokasi dilindungi; akses berbasis role | HTTPS, hashed credentials, least privilege |
-| **Akurasi** | Validasi ganda (wajah + GPS) sebelum absensi diterima | Reject jika salah satu gagal |
-| **Ketersediaan** | Layanan API tersedia selama jam operasional | Target uptime disepakati di infra doc |
-| **Performa** | Respons API absensi | &lt; 3 detik pada kondisi normal (draft) |
-| **Usabilitas** | Clock-in dapat diselesaikan dalam alur singkat di mobile | ≤ 3 langkah utama setelah buka app |
-| **Auditability** | Setiap absensi & approval tercatat | Immutable log fields (who/when/result) |
-| **Portabilitas data** | Ekspor laporan standar | PDF & Excel |
+| Kategori | Requirement | Target |
+|----------|-------------|--------|
+| **Keamanan** | JWT Bearer; embedding wajah tidak di-log penuh; RBAC | HTTPS, bcrypt, least privilege; sesi **12 jam** |
+| **Akurasi** | Validasi ganda (wajah + GPS) sebelum absensi diterima | Reject jika salah satu gagal; face cosine ≥ **0.65**; GPS accuracy ≤ **50 m** |
+| **Ketersediaan** | Layanan API selama jam operasional | Best-effort **07:00–18:00 WIB**; smoke H-1 sebelum demo |
+| **Performa** | Respons API | p95 umum **&lt; 1.5 s**; absensi (clock-in/out) **&lt; 3 s** |
+| **Usabilitas** | Clock-in singkat di mobile | ≤ 3 langkah utama setelah buka app |
+| **Auditability** | Absensi & approval tercatat | `audit_logs` + fields face/GPS di attendance |
+| **Portabilitas data** | Ekspor laporan | **Excel wajib**; PDF nice-to-have |
 
 ---
 
@@ -192,13 +192,58 @@ Prioritas: **P0** = harus ada di MVP · **P1** = penting · **P2** = nice-to-hav
 ```mermaid
 flowchart TD
   A[Login] --> B[Buka absensi]
-  B --> C[Ambil wajah]
+  B --> C[Ambil wajah → embedding on-device]
   C --> D[Cek GPS geofence]
   D --> E{Wajah & GPS valid?}
-  E -->|Ya| F[Simpan clock-in + timestamp]
+  E -->|Ya| F[Simpan clock-in + work_date]
   F --> G[Tampilkan konfirmasi]
-  E -->|Tidak| H[Tampilkan alasan gagal]
+  E -->|Tidak| H[Tampilkan reason code]
 ```
+
+### State machine — hari absensi
+
+```mermaid
+stateDiagram-v2
+  [*] --> BelumAbsen: work_date baru
+  BelumAbsen --> Tervalidasi: clock-in wajah+GPS OK
+  BelumAbsen --> IzinCuti: leave approved mencakup hari
+  BelumAbsen --> Alpha: cron akhir hari tanpa clock-in/leave
+  Tervalidasi --> Hadir: clock-in ≤ shift_start + grace
+  Tervalidasi --> Terlambat: clock-in > shift_start + grace
+  Hadir --> Selesai: clock-out OK
+  Terlambat --> Selesai: clock-out OK
+  IzinCuti --> [*]
+  Alpha --> [*]
+  Selesai --> [*]
+```
+
+| Status API (`attendance_status`) | Label UI |
+|----------------------------------|----------|
+| `present` | Hadir |
+| `late` | Terlambat |
+| `absent` | Alpha |
+| `leave` | Izin |
+| `holiday` | Libur (opsional org) |
+
+### State machine — approval (leave / OT)
+
+```mermaid
+stateDiagram-v2
+  [*] --> pending: submit
+  pending --> approved: supervisor setujui
+  pending --> rejected: supervisor tolak + alasan
+  pending --> cancelled: karyawan batalkan
+  approved --> [*]
+  rejected --> [*]
+  cancelled --> [*]
+```
+
+| Status API (`request_status`) | Label UI |
+|-------------------------------|----------|
+| `pending` | Menunggu |
+| `approved` | Disetujui |
+| `rejected` | Ditolak |
+| `cancelled` | Dibatalkan |
 
 ### Pengajuan izin/cuti
 
@@ -226,9 +271,9 @@ sequenceDiagram
 flowchart LR
   A[HRD pilih periode & filter] --> B[Sistem aggregate data]
   B --> C{Format?}
-  C -->|PDF| D[Generate PDF]
-  C -->|Excel| E[Generate Excel]
-  D --> F[Unduh / bagikan]
+  C -->|Excel wajib| E[Generate Excel → R2 signed URL]
+  C -->|PDF opsional| D[Generate PDF → R2]
+  D --> F[Unduh]
   E --> F
 ```
 
@@ -243,8 +288,7 @@ flowchart LR
   E --> F[Dokumentasi & Laporan]
 ```
 
-*Diagram detail tambahan (state machine absensi, ERD) akan dilengkapi pada fase System Design (Minggu 2).*
-
+State machine absensi & approval terkunci di atas; ERD terkunci di [Infrastructure §5.1](./infrastructure#51-database--neon-postgresql).
 ---
 
 ## 8. Asumsi & dependensi
@@ -260,13 +304,12 @@ flowchart LR
 
 - **Backend (terkunci):** Bun + Hono + Drizzle + Neon PostgreSQL + Cloudflare Workers — lihat [Infrastructure](./infrastructure)
 - **Web (terkunci):** Vue 3 + Vite + TypeScript + Orval → Cloudflare Pages
-- **Mobile (terkunci):** React Native + Expo (SDK 57) + Expo Router + Orval → APK via GitHub Actions
-- Library face recognition (mis. face-api.js / Python `face_recognition`) — *TBD runtime*
-- Geolocation API + konfigurasi geofencing (server-side)
+- **Mobile (terkunci):** React Native + Expo (SDK 57) + Expo Router + Orval → APK via GitHub Actions · **dev client** untuk face
+- **Face (terkunci):** On-device **MobileFaceNet** (TFLite) → embedding; Worker cosine ≥ 0.65 — *bukan* face-api.js di Workers
+- Geolocation API + validasi geofence server-side
 - **Firebase Cloud Messaging (FCM)** — push Android (approval + reminder)
-- **Cloudflare R2** — objek enrollment / bukti absensi
-- Infrastruktur deployment selengkapnya: [Infrastructure Document](./infrastructure)
-
+- **Cloudflare R2** — ekspor laporan (Excel/PDF signed URL); **bukan** foto wajah
+- Infrastruktur: [Infrastructure Document](./infrastructure)
 ---
 
 ## 9. Milestone & jadwal (dari proposal)
@@ -308,45 +351,67 @@ Aturan berikut mengunci perilaku produk untuk semester ini. Kontrak API, UI, dan
 | Sukses clock-out | **Reuse** `M-ATT04` (bukan layar baru) |
 | RBAC ditolak | Route guard + toast/redirect — **tanpa** halaman denied penuh |
 
-### 10.2 Face enrollment
+### 10.2 Face enrollment & verifikasi
 
 | Aturan | Keputusan |
 |--------|-----------|
+| Runtime | **On-device** MobileFaceNet → embedding 192-d; Worker cosine similarity |
+| Threshold | Cosine ≥ **0.65** (`FACE_MATCH_THRESHOLD`) |
+| Escape | `FACE_MODE=stub` → `face_result = skipped` (tanpa ubah kontrak) |
 | Siapa enroll | Karyawan self-enroll di `M-P03` |
-| Jumlah foto | **3** foto jelas → embedding disimpan |
+| Jumlah sampel | **3** embedding jelas → simpan sampel + mean |
 | Approve HRD atas template | Tidak wajib |
-| Snapshot verifikasi | Opsional / retensi singkat; yang wajib adalah embedding |
+| Retensi foto | **Tidak ada** — embedding only (D-09) |
+| Limitasi MVP | Embedding dari klien dipercaya; anti-spoof out of scope |
 
 ### 10.3 Izin, cuti, lembur, approval
 
 | Aturan | Keputusan |
 |--------|-----------|
-| Jenis leave MVP | Enum: **Sakit** \| **Cuti** \| **Izin lain** |
+| Jenis leave MVP | Enum API: `sick` \| `annual` \| `other` → UI: **Sakit** \| **Cuti** \| **Izin lain** |
 | Kuota/saldo | Tidak dihitung di MVP |
-| Pending | Boleh **batal** (kontrol di `M-LV03`); tidak boleh edit |
+| Pending | Boleh **batal** (`M-LV03`); tidak boleh edit |
 | Overlap leave vs absensi valid | Tolak pengajuan |
 | OT | Tanggal + jam mulai/selesai; **maks 4 jam** (hard reject); tidak wajib link ke record absensi |
 | Approve | **Hanya web** (`W-AP*`) |
 | Tolak | **Wajib alasan**; tombol Tolak disabled sampai alasan terisi |
+| Status request | `pending` \| `approved` \| `rejected` \| `cancelled` |
 
 ### 10.4 Master data & laporan
 
 | Aturan | Keputusan |
 |--------|-----------|
 | User P0 fields | `email`, `full_name`, `role`, `is_active`, password awal; `supervisor_id` opsional |
-| Site/shift per user | Defer; geofence org-wide + default shift org |
+| NIP | Wajib di `employees.nip` (unik); login Email **atau** NIP |
+| Site/shift per user | Defer; geofence org-wide + default shift org `08:00` WIB |
+| Timezone | **Asia/Jakarta**; `work_date` lokal |
 | Ekspor laporan | Kolom: NIP, nama, tanggal, masuk, keluar, status, jenis leave, jam OT |
-| Format | **Excel wajib MVP**; PDF nice-to-have di sprint yang sama bila muat |
+| Format | **Excel wajib MVP** → R2 signed URL; PDF nice-to-have |
 
 ### 10.5 Auth & notifikasi
 
 | Aturan | Keputusan |
 |--------|-----------|
 | Lupa password self-service | **CUT** (reset HRD) |
-| Notifikasi P0 | **In-app feed + FCM** untuk status approval (dan reminder bila siap) |
+| Sesi | JWT **12 jam** |
+| Notifikasi P0 | **In-app feed + FCM** untuk status approval |
 | Quiet hours | P2 |
-| Object storage | **Cloudflare R2** untuk embedding/bukti terkait absensi |
+| Object storage | **Cloudflare R2** untuk ekspor laporan saja |
 
+### 10.6 Reason code & enum
+
+| Reason code | Copy UI (ID) |
+|-------------|--------------|
+| `OUT_OF_GEOFENCE` | Di luar area kerja |
+| `LOW_GPS_ACCURACY` | Akurasi GPS terlalu rendah |
+| `FACE_NO_MATCH` | Wajah tidak cocok |
+| `FACE_NOT_ENROLLED` | Wajah belum terdaftar — enroll dulu |
+| `FACE_LOW_QUALITY` | Kualitas wajah kurang jelas |
+| `ALREADY_CLOCKED_IN` | Sudah clock-in hari ini |
+| `NOT_CLOCKED_IN` | Belum clock-in — tidak bisa clock-out |
+| `OUTSIDE_SHIFT_WINDOW` | Di luar jendela shift (jika diaktifkan) |
+
+Screens `M-ATT05` / `M-ATT06` menampilkan reason di atas (bukan hanya `FACE_MISMATCH`).
 ---
 
 ## 11. Acceptance criteria (MVP)
@@ -370,7 +435,8 @@ MVP dianggap selesai bila:
 | GPS tidak akurat / indoor | Geofence gagal | Radius default 100 m; reject + reason code; log akurasi |
 | Scope creep fitur payroll penuh | Telat delivery | Kunci batasan: hanya ekspor |
 | Ketersediaan stakeholder UAT | Feedback terlambat | Jadwalkan UAT di Minggu 7; Atin jalankan tes manual per sprint |
-| Integrasi FCM / R2 | Notifikasi / upload gagal | Wiring di S3–S5; fallback in-app feed jika FCM down |
+| Integrasi FCM / R2 | Notifikasi / ekspor gagal | Wiring di S3–S5; fallback in-app feed jika FCM down; R2 hanya reports |
+| Native face build gagal | Absensi terblokir | `FACE_MODE=stub` tanpa ubah kontrak API |
 
 ---
 
@@ -410,13 +476,14 @@ MVP dianggap selesai bila:
 | 0.1.3 | 2026-09-24 | Dependensi web (Vue/CF Pages) & mobile (RN+Expo) terkunci |
 | 0.2.0 | 2026-09-24 | Kunci keputusan domain MVP; tim lengkap (Atin + Anfa); Atin = PL/Analyst + manual tester; cut face override / lupa password / kuota |
 | 0.2.1 | 2026-09-24 | Hub clock-out state, batal leave, RBAC guard; kunci FCM + Cloudflare R2 |
+| 1.0.0 | 2026-09-24 | **Locked:** NFR angka, state machine, reason codes, enums, face on-device, D-09 embedding-only, ATT-06 definisi |
 
 ---
 
 ## Referensi
 
 - Proposal Capstone Project — Pengembangan Aplikasi Absensi Divisi Operation (Kelompok B, 2026)
-- [Infrastructure Document (Draft)](./infrastructure)
+- [Infrastructure Document](./infrastructure)
 - [Design System](./design-system)
 - [Screens & Pages](./screens)
 - [Introduction](./)

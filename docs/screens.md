@@ -6,13 +6,13 @@ title: Screens & Pages
 # Screens & Pages
 
 :::info Status
-**Draft v0.1.4** — inventaris layar Mobile (M-\*) dan Web (W-\*). State ekstra (empty/RBAC/loading) = komponen FE, lihat [Design System §6.5](./design-system#65-state-tanpa-frame-ekstra-pragmatis). Rule domain: [PRD §10](./prd#10-keputusan-domain-terkunci-mvp).
+**Locked v1.0** — inventaris layar Mobile (M-\*) dan Web (W-\*). State ekstra = komponen FE ([Design System §6.5](./design-system#65-state-tanpa-frame-ekstra-pragmatis)). Rule domain: [PRD §10](./prd#10-keputusan-domain-terkunci-mvp). testID: [Design System §7](./design-system#7-registry-testid--data-testid).
 :::
 
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops |
-| Version | 0.1.4 |
+| Version | 1.0.0 |
 | Mobile IDs | **M-\*** (karyawan Operation) — RN / Expo |
 | Web IDs | **W-\*** (supervisor / HRD / admin) — Vue 3 |
 | Last updated | 2026-09-24 |
@@ -79,8 +79,8 @@ flowchart LR
 | M-ATT02 | Capture wajah | Kamera + guide oval (ATT-02); retry maks 3 |
 | M-ATT03 | Validasi lokasi | GPS strip + placeholder peta; akurasi ≤ 50 m; radius default 100 m |
 | M-ATT04 | Absensi berhasil | Reuse untuk **clock-in & clock-out** (field Jenis) |
-| M-ATT05 | Gagal — wajah | Reason `FACE_MISMATCH` — **tanpa** override supervisor |
-| M-ATT06 | Gagal — GPS | Reason `OUT_OF_GEOFENCE` / akurasi rendah |
+| M-ATT05 | Gagal — wajah | Reason `FACE_NO_MATCH` / `FACE_NOT_ENROLLED` / `FACE_LOW_QUALITY` — **tanpa** override |
+| M-ATT06 | Gagal — GPS | Reason `OUT_OF_GEOFENCE` / `LOW_GPS_ACCURACY` |
 | M-ATT07 | Riwayat absensi | List per periode |
 | M-ATT08 | Detail catatan | Audit fields: waktu, lat/lng, hasil face/GPS |
 
@@ -133,7 +133,7 @@ flowchart LR
 |----|---------|---------|---------|
 | W-A01 | Masuk dashboard | Semua | |
 | W-D01 | Ringkasan operasional | Supervisor / HRD | Metrik harian (RPT-01) |
-| W-D02 | Kehadiran live | Supervisor | Siapa sudah/belum absen (ATT-06) |
+| W-D02 | Kehadiran live | Supervisor | Belum absen = aktif tanpa baris attendance `work_date` hari ini (ATT-06) |
 
 ### 3.2 Persetujuan
 
@@ -225,3 +225,4 @@ Lihat README plugin untuk build & load di Figma.
 | 0.1.2 | 2026-09-24 | Catatan implementasi: RN+Expo (mobile), Vue 3 (web) |
 | 0.1.3 | 2026-09-24 | Selaras PRD v0.2: clock-out, leave enum, reject reason, geofence 100m, Excel-first, W-H02 P0 |
 | 0.1.4 | 2026-09-24 | Hub pasca clock-in, batal leave, segment Izin\|Lembur; state ekstra tanpa frame baru |
+| 1.0.0 | 2026-09-24 | **Locked:** reason codes PRD §10.6, ATT-06 definisi, tautan testID registry |

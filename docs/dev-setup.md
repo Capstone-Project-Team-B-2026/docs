@@ -6,13 +6,13 @@ title: Development Tools Setup
 # Development Tools Setup
 
 :::info Status
-**Draft v0.2** — panduan instalasi & konfigurasi tooling lokal untuk Capstone Project 50 Team B 2026. Fokus utama **Windows**; macOS & Linux disertakan ringkas. Selaras stack aktual di repo backend / web / mobile.
+**Living** — panduan instalasi & konfigurasi tooling lokal. Fokus utama **Windows**; macOS & Linux disertakan ringkas. Selaras stack terkunci di [Infrastructure](./infrastructure).
 :::
 
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.2.0 (Draft) |
+| Version | 0.3.0 |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
 | Last updated | 2026-09-24 |
 
@@ -37,13 +37,15 @@ Dokumen terkait: [Infrastructure](./infrastructure) (stack & deploy) · [SDLC](.
 | **GitHub CLI** (`gh`) | Web & mobile (`npm run api:sync` ke OpenAPI private) | Latest |
 | **JDK 17** | Mobile — `expo prebuild` / Gradle APK | **17** (LTS) |
 | **Android Studio** | Mobile — emulator, SDK, debug APK | Latest stable |
-| **Expo Go** (opsional) | Mobile — uji cepat di device tanpa prebuild | Sesuai Expo SDK **57** |
+| **Dev client / APK** | Mobile face/camera (vision-camera + TFLite) | `expo prebuild` — **Expo Go tidak cukup** |
+| **Playwright** (browsers) | Web E2E — `npx playwright install chromium` | Sesuai `@playwright/test` di web |
+| **Maestro CLI** | Mobile E2E Android — [install](https://docs.maestro.dev/getting-started/installing-maestro) | Latest |
 
 | Peran | Tool wajib | Package manager | Opsional |
 |-------|------------|-----------------|----------|
 | Backend | Git, Bun, VS Code | `bun` | Wrangler CLI, `gh` |
-| Web | Git, Node/npm, VS Code, `gh` | `npm` | — |
-| Mobile | Git, Node/npm, JDK 17, Android Studio, VS Code, `gh` | `npm` | Expo Go, device fisik |
+| Web | Git, Node/npm, VS Code, `gh` | `npm` | Playwright Chromium |
+| Mobile | Git, Node/npm, JDK 17, Android Studio, VS Code, `gh` | `npm` | Device fisik, Maestro CLI |
 | Docs / UI | Git, Bun, VS Code | `bun` | Figma Desktop |
 
 :::note Bun vs npm
@@ -368,6 +370,7 @@ Alur branch / PR: [Git Workflow](./git-workflow).
 |-------|---------|-----------|
 | 0.1.0 | 2026-09-24 | Draft awal: Git, VS Code, Bun, Node, JDK, Android Studio; fokus Windows |
 | 0.2.0 | 2026-09-24 | Selaras repo: Bun=BE/docs, npm=web/mobile; RN+Expo (bukan Capacitor); `gh` untuk OpenAPI; CF Pages / APK CI |
+| 0.3.0 | 2026-09-24 | Living guide; Expo Go tidak cukup untuk face (dev client / APK wajib) |
 
 ---
 

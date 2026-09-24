@@ -24,24 +24,24 @@ Keputusan domain MVP terkunci di [PRD §10](./prd#10-keputusan-domain-terkunci-m
 
 | Dokumen | Status | Deskripsi |
 |---------|--------|-----------|
-| [Product Requirements Document (PRD)](./prd) | **v0.2.1** (keputusan domain terkunci) | Kebutuhan produk, scope, user stories, acceptance criteria |
-| [Software Development Life Cycle (SDLC)](./sdlc) | Draft | Proses hybrid Waterfall + Scrum, fase, DoD, release |
-| [Infrastructure Document](./infrastructure) | Draft v0.3.1 | Stack terkunci + **FCM** + **Cloudflare R2** |
-| [Design System](./design-system) | Draft | Token warna, tipografi, komponen, pola UI |
-| [Screens & Pages](./screens) | Draft | Inventaris layar mobile (M-*) & web (W-*) |
-| [Development Tools Setup](./dev-setup) | Draft | Instalasi Git, VS Code, Bun/npm, JDK, Android Studio (fokus Windows) |
-| [Git Workflow](./git-workflow) | Draft | Branching trunk-based, commit, PR, review, kolaborasi tim |
+| [Product Requirements Document (PRD)](./prd) | **Locked v1.0** | Kebutuhan produk, NFR, state machine, acceptance |
+| [Software Development Life Cycle (SDLC)](./sdlc) | **Locked v1.0** | Proses hybrid, DoR/DoD, testing, kontrak OpenAPI |
+| [Infrastructure Document](./infrastructure) | **Locked v1.0** | Stack + face on-device + FCM + R2 + ERD v1 |
+| [Design System](./design-system) | **Locked v1.0** | Token, komponen, testID registry |
+| [Screens & Pages](./screens) | **Locked v1.0** | Inventaris layar mobile (M-*) & web (W-*) |
+| [Development Tools Setup](./dev-setup) | **Living** | Instalasi tooling lokal (fokus Windows) |
+| [Git Workflow](./git-workflow) | **Living** | Branching trunk-based, commit, PR, review |
 
 ## Stack (ringkas)
 
 | Lapisan | Repo | Stack | Package | Deploy |
 |---------|------|-------|---------|--------|
 | Backend | [backend](https://github.com/Capstone-Project-Team-B-2026/backend) | Bun · Hono · Zod→OpenAPI · Drizzle · Neon | `bun` | CF Workers (`main`→dev, `v*`→prod) |
-| Web | [web](https://github.com/Capstone-Project-Team-B-2026/web) | Vue 3 · Vite · Orval · Vitest | `npm` | CF Pages |
-| Mobile | [mobile](https://github.com/Capstone-Project-Team-B-2026/mobile) | React Native · Expo 57 · Expo Router · Orval · Jest | `npm` | APK artifact (Actions) |
+| Web | [web](https://github.com/Capstone-Project-Team-B-2026/web) | Vue 3 · Vite · Orval · Vitest · Playwright | `npm` | CF Pages |
+| Mobile | [mobile](https://github.com/Capstone-Project-Team-B-2026/mobile) | React Native · Expo 57 · Orval · Jest · Maestro | `npm` | APK artifact (Actions) |
 | Docs | [docs](https://github.com/Capstone-Project-Team-B-2026/docs) | Docusaurus | `bun` | GitHub Pages |
 
-Auth API: JWT · roles `employee` / `supervisor` / `hrd`. Backend coverage CI ≥ 95%. OpenAPI: `/docs` lokal / Worker; klien sync via `gh` + Orval.
+Auth: JWT · roles `employee` / `supervisor` / `hrd` · sesi 12 jam. Face: on-device MobileFaceNet → Worker cosine. OpenAPI: bump `info.version` + publish ke `static/openapi.json`.
 
 Detail: [Infrastructure Document](./infrastructure). Setup lokal: [Development Tools Setup](./dev-setup).
 
