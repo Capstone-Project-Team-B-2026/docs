@@ -14,23 +14,24 @@ Dokumentasi Capstone Project 50 Team B 2026 — **Aplikasi Absensi Divisi Operat
 |---------|--------|-----------|
 | [Product Requirements Document (PRD)](./prd) | Draft | Kebutuhan produk, scope, user stories, acceptance criteria |
 | [Software Development Life Cycle (SDLC)](./sdlc) | Draft | Proses hybrid Waterfall + Scrum, fase, DoD, release |
-| [Infrastructure Document](./infrastructure) | Draft v0.2 | Arsitektur & deploy — **backend terkunci** (Bun/Hono/Neon/Workers) |
+| [Infrastructure Document](./infrastructure) | Draft v0.3 | Stack terkunci: BE Workers · web CF Pages · mobile Expo/RN |
 | [Design System](./design-system) | Draft | Token warna, tipografi, komponen, pola UI |
 | [Screens & Pages](./screens) | Draft | Inventaris layar mobile (M-*) & web (W-*) |
+| [Development Tools Setup](./dev-setup) | Draft | Instalasi Git, VS Code, Bun/npm, JDK, Android Studio (fokus Windows) |
+| [Git Workflow](./git-workflow) | Draft | Branching trunk-based, commit, PR, review, kolaborasi tim |
 
-## Backend (ringkas)
+## Stack (ringkas)
 
-Repo: [Capstone-Project-Team-B-2026/backend](https://github.com/Capstone-Project-Team-B-2026/backend)
+| Lapisan | Repo | Stack | Package | Deploy |
+|---------|------|-------|---------|--------|
+| Backend | [backend](https://github.com/Capstone-Project-Team-B-2026/backend) | Bun · Hono · Zod→OpenAPI · Drizzle · Neon | `bun` | CF Workers (`main`→dev, `v*`→prod) |
+| Web | [web](https://github.com/Capstone-Project-Team-B-2026/web) | Vue 3 · Vite · Orval · Vitest | `npm` | CF Pages |
+| Mobile | [mobile](https://github.com/Capstone-Project-Team-B-2026/mobile) | React Native · Expo 57 · Expo Router · Orval · Jest | `npm` | APK artifact (Actions) |
+| Docs | [docs](https://github.com/Capstone-Project-Team-B-2026/docs) | Docusaurus | `bun` | GitHub Pages |
 
-| Item | Nilai |
-|------|-------|
-| Stack | Bun · TypeScript · Hono · Zod→OpenAPI · Drizzle · Neon |
-| Deploy | Cloudflare Workers (trunk-based: `main` → dev, tag `v*` → prod) |
-| Auth | JWT · roles `employee` / `supervisor` / `hrd` |
-| Quality | ESLint · Prettier · Husky · CI coverage ≥ 95% |
-| OpenAPI | `/docs` pada Worker / `bun run dev` lokal |
+Auth API: JWT · roles `employee` / `supervisor` / `hrd`. Backend coverage CI ≥ 95%. OpenAPI: `/docs` lokal / Worker; klien sync via `gh` + Orval.
 
-Detail: [Infrastructure Document](./infrastructure).
+Detail: [Infrastructure Document](./infrastructure). Setup lokal: [Development Tools Setup](./dev-setup).
 
 ## Desain di Figma
 

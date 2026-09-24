@@ -12,10 +12,10 @@ title: Product Requirements Document (PRD)
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.1.2 (Draft) |
+| Version | 0.1.3 (Draft) |
 | Mata Kuliah | STSI4440 |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
-| Last updated | 2026-09-23 |
+| Last updated | 2026-09-24 |
 
 ---
 
@@ -251,9 +251,11 @@ flowchart LR
 
 ### Dependensi
 
-- **Backend (sudah dipilih):** Bun + Hono + Drizzle + Neon PostgreSQL + Cloudflare Workers — lihat [Infrastructure](./infrastructure)
+- **Backend (terkunci):** Bun + Hono + Drizzle + Neon PostgreSQL + Cloudflare Workers — lihat [Infrastructure](./infrastructure)
+- **Web (terkunci):** Vue 3 + Vite + TypeScript + Orval → Cloudflare Pages
+- **Mobile (terkunci):** React Native + Expo (SDK 57) + Expo Router + Orval → APK via GitHub Actions
 - Library face recognition (mis. face-api.js / Python `face_recognition`) — *TBD*
-- Geolocation API + konfigurasi geofencing
+- Geolocation API + konfigurasi geofencing (server-side)
 - Firebase Cloud Messaging (atau setara) untuk push notification — *TBD*
 - Cloud storage (Firebase / R2 / S3) untuk aset terkait absensi — *TBD*
 - Infrastruktur deployment selengkapnya: [Infrastructure Document](./infrastructure)
@@ -330,6 +332,7 @@ MVP dianggap selesai bila:
 | 0.1.0 | 2026-09-22 | Draft awal dari proposal capstone Kelompok B |
 | 0.1.1 | 2026-09-23 | Dependensi backend diselaraskan ke stack aktual (Infra v0.2) |
 | 0.1.2 | 2026-09-24 | Milestone sprint 1 minggu; BE∥UI paralel sejak S2 |
+| 0.1.3 | 2026-09-24 | Dependensi web (Vue/CF Pages) & mobile (RN+Expo) terkunci |
 
 ---
 

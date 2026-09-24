@@ -6,23 +6,23 @@ title: Infrastructure Document
 # Infrastructure Document
 
 :::info Status
-**Draft (stack backend + klien terkunci)** — backend Bun/Hono/Neon/Workers; web Vue 3 + Orval + GH Pages; mobile Vue 3 + Capacitor + APK CI. Face/storage/push masih terbuka.
+**Draft (stack backend + klien terkunci)** — backend Bun/Hono/Neon/Workers; web Vue 3 + Vite + Orval + **Cloudflare Pages**; mobile **React Native + Expo** + Orval + APK CI. Face/storage/push masih terbuka.
 :::
 
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.2.1 (Draft) |
+| Version | 0.3.0 (Draft) |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
-| Last updated | 2026-09-23 |
+| Last updated | 2026-09-24 |
 
 ---
 
 ## 1. Tujuan dokumen
 
-Dokumen ini mendeskripsikan arsitektur infrastruktur Nexus Ops: komponen sistem, lingkungan, penyimpanan data, keamanan, observabilitas, dan deployment. **Backend API sudah di-bootstrap** di repo terpisah; bagian klien & layanan pendukung (face, FCM, object storage) masih mengikuti rencana proposal.
+Dokumen ini mendeskripsikan arsitektur infrastruktur Nexus Ops: komponen sistem, lingkungan, penyimpanan data, keamanan, observabilitas, dan deployment. **Backend, web, dan mobile sudah di-bootstrap** di repo terpisah; layanan pendukung (face, FCM, object storage) masih terbuka.
 
-Dokumen terkait: [Product Requirements Document (PRD)](./prd)
+Dokumen terkait: [PRD](./prd) · [Dev Setup](./dev-setup) · [Git Workflow](./git-workflow)
 
 ---
 
@@ -32,12 +32,12 @@ Sistem terdiri dari tiga permukaan klien + backend API + layanan pendukung:
 
 | Lapisan | Komponen | Teknologi |
 |---------|----------|-----------|
-| Mobile | Aplikasi absensi karyawan (Android) | **Vue 3 + Capacitor** |
-| Web | Dashboard admin / supervisor / HRD | **Vue 3 + Vite** |
+| Mobile | Aplikasi absensi karyawan (Android) | **React Native + Expo (SDK 57)** · Expo Router · TypeScript · Orval |
+| Web | Dashboard admin / supervisor / HRD | **Vue 3 + Vite + TypeScript** · Vue Router · Orval · Vitest |
 | **API** | RESTful backend | **Bun + TypeScript + Hono** · Zod→OpenAPI · DDD modules |
 | **Data** | Relational DB | **Neon (PostgreSQL)** · Drizzle ORM |
 | AI/CV | Face recognition service | face-api.js **atau** Python `face_recognition` *(TBD)* |
-| Lokasi | GPS + geofencing | Geolocation API (device) + validasi server |
+| Lokasi | GPS + geofencing | Device GPS + validasi server *(modul placeholder)* |
 | Storage | Objek (foto enroll / bukti absensi) | Firebase Storage **atau** R2/S3 *(TBD)* |
 | Push | Notifikasi | Firebase Cloud Messaging (FCM) *(TBD)* |
 | Design | UI/UX | Figma (+ generator di `docs/figma-plugin`) |
@@ -106,19 +106,33 @@ sequenceDiagram
 
 ## 3. Komponen & tanggung jawab
 
-### 3.1 Mobile application
+### 3.1 Mobile application *(bootstrapped)*
 
-- Clock-in/out, kamera (capture wajah), GPS, pengajuan izin/cuti/lembur
-- Menerima push notification
-- Menyimpan token sesi secara aman (secure storage OS)
-- **Target OS:** Android (MVP)
+| Aspek | Keputusan |
+|-------|-----------|
+| Stack | **React Native + Expo SDK 57** · TypeScript · Expo Router (`app/`) |
+| Package | **npm** (`packageManager: npm@10.9.0`) |
+| API client | **Orval** → Axios dari `openapi/openapi.json` |
+| Auth token | AsyncStorage key `nexus_ops_token` *(secure storage OS dapat ditambah nanti)* |
+| Env | `EXPO_PUBLIC_APP_ENV`, `EXPO_PUBLIC_API_BASE_URL` |
+| Quality | ESLint · Prettier · Husky · Jest (`jest-expo`, coverage soft ~40%) |
+| Artefak | GitHub Actions APK debug (`expo prebuild` → Gradle; folder `android/` tidak di-commit) |
+| Target OS | **Android** (MVP); iOS bundle id sudah di-config, bukan fokus MVP |
 
-### 3.2 Web dashboard
+Fitur produk (clock-in, kamera, GPS, leave/OT, FCM) menyusul di atas skeleton ini.
 
-- Monitoring kehadiran real-time / rekap
-- Approval supervisor (opsional juga di mobile — TBD)
-- Manajemen user & master data (HRD)
-- Generate / unduh laporan PDF & Excel
+### 3.2 Web dashboard *(bootstrapped)*
+
+| Aspek | Keputusan |
+|-------|-----------|
+| Stack | **Vue 3 + Vite + TypeScript** · Vue Router |
+| Package | **npm** |
+| API client | **Orval** → Axios dari `openapi/openapi.json` |
+| Env | `VITE_APP_ENV`, `VITE_API_BASE_URL`, `VITE_BASE_PATH` |
+| Quality | ESLint · Prettier · Husky · Vitest (coverage soft) |
+| Deploy | **Cloudflare Pages** — trunk-based (`main` → `dev-nexus-ops-web`, tag `v*` → `nexus-ops-web`) |
+
+Fitur produk (monitoring, approval, laporan, HRD) menyusul di atas skeleton ini.
 
 ### 3.3 Backend API *(implemented skeleton)*
 
@@ -361,23 +375,30 @@ Lokal: Husky + lint-staged (eslint --fix + prettier) pada pre-commit; juga `open
 
 | Repo | CI | Deploy / artefak |
 |------|----|------------------|
-| **Web** | format · lint · typecheck · test (coverage soft, tidak digate ≥95%) | `main` → GH Pages `/web/dev/` · tag `v*` → `/web/` |
-| **Mobile** | format · lint · typecheck · test | `main` → APK debug (dev artifact) · tag `v*` → APK debug (stg artifact) |
+| **Web** | format · lint · typecheck · test (coverage soft) | `deploy.yml`: `main` → Cloudflare Pages **`dev-nexus-ops-web`** · tag `v*` → **`nexus-ops-web`** |
+| **Mobile** | format · lint · typecheck · test (coverage soft) | `build-apk.yml`: `main` → artifact **`nexus-ops-mobile-dev`** · tag `v*` → **`nexus-ops-mobile-stg`** |
 
-Klien memakai **Orval** dari salinan `openapi/openapi.json` (sync manual dari backend `main` via `api:sync`).
+Klien memakai **Orval** dari `openapi/openapi.json`. Sync dari backend private: `npm run api:sync` (`gh api`, bukan raw.githubusercontent). Butuh `gh auth login` + akses repo backend.
+
+Contoh URL web (Pages):
+
+- Dev: `https://dev-nexus-ops-web.pages.dev`
+- Prod: `https://nexus-ops-web.pages.dev`
 
 ### Deployment view
 
 ```mermaid
 flowchart TB
   subgraph CI_CD[GitHub Actions]
-    GH[ci.yml + deploy.yml]
+    BE[backend ci + deploy]
+    WEBCI[web ci + deploy Pages]
+    MOBCI[mobile ci + build-apk]
   end
 
   subgraph Runtime
     API[Cloudflare Workers<br/>Hono API]
-    WEB[Web · TBD]
-    MOB[Android APK / AAB]
+    WEB[Cloudflare Pages<br/>Vue 3]
+    MOB[Android APK artifact<br/>Expo / RN]
   end
 
   subgraph DataPlane[Data & Integrasi]
@@ -386,9 +407,11 @@ flowchart TB
     FCM[FCM TBD]
   end
 
-  GH --> API
-  GH --> WEB
-  GH --> MOB
+  BE --> API
+  WEBCI --> WEB
+  MOBCI --> MOB
+  WEB -->|HTTPS| API
+  MOB -->|HTTPS| API
   API --> DB
   API -.-> Store
   API -.-> FCM
@@ -397,9 +420,9 @@ flowchart TB
 | Komponen | Strategi |
 |----------|----------|
 | **Backend** | Cloudflare Workers + Neon · trunk-based (`main` → dev, `v*` → prod) |
-| Web | **GitHub Pages** (`main` → `/dev`, tag `v*` → `/`) |
-| Mobile | **GitHub Actions** APK artifact (`main` → dev, tag `v*` → stg) |
-| Docs | Docusaurus → GitHub Pages |
+| **Web** | **Cloudflare Pages** · trunk-based (`main` → `dev-nexus-ops-web`, `v*` → `nexus-ops-web`) |
+| **Mobile** | **GitHub Actions** APK debug artifact (`main` → dev, `v*` → stg); `expo prebuild` di CI |
+| **Docs** | Docusaurus → GitHub Pages |
 
 ---
 
@@ -430,8 +453,8 @@ Neon + Workers cocok untuk spike ringan; laporan berat dapat diantrikan (P1) jik
 
 | ID | Keputusan | Status | Catatan |
 |----|-----------|--------|---------|
-| D-01 | Stack mobile | **Dipilih** | Vue 3 + Capacitor (Android) · Orval dari OpenAPI |
-| D-02 | Stack web | **Dipilih** | Vue 3 + Vite · Orval dari OpenAPI · GH Pages |
+| D-01 | Stack mobile | **Dipilih** | React Native + Expo SDK 57 · Expo Router · Orval · APK via Actions |
+| D-02 | Stack web | **Dipilih** | Vue 3 + Vite · Orval · **Cloudflare Pages** |
 | D-03 | Stack API | **Dipilih** | Bun + TypeScript + Hono + Zod OpenAPI + DDD |
 | D-04 | Database | **Dipilih** | Neon PostgreSQL + Drizzle |
 | D-05 | Face recognition runtime | **Terbuka** | Embedded vs service |
@@ -439,6 +462,8 @@ Neon + Workers cocok untuk spike ringan; laporan berat dapat diantrikan (P1) jik
 | D-07 | Hosting API | **Dipilih** | Cloudflare Workers |
 | D-08 | Auth token | **Dipilih** | JWT Bearer |
 | D-09 | Retensi foto wajah | **Terbuka** | Legal/privacy + stakeholder |
+| D-10 | Package managers | **Dipilih** | Bun (backend, docs) · npm (web, mobile) |
+| D-11 | OpenAPI → klien | **Dipilih** | Commit `openapi.json` di backend; klien sync via `gh api` + Orval |
 
 ---
 
@@ -449,9 +474,9 @@ Selaras [SDLC §4](./sdlc) (sprint 1 minggu; **BE ∥ UI** sejak S2).
 | Sprint | Aktivitas |
 |--------|-----------|
 | S1 | Inventaris NFR; draft env & secret policy |
-| S2 | Stack API, Neon, Workers bootstrap, OpenAPI, CI; kickoff kontrak untuk mobile/web |
+| S2 | Stack API, Neon, Workers, OpenAPI, CI; bootstrap web (Vue/Pages) & mobile (Expo) + kontrak Orval |
 | S3–S5 | Attendance + face + geofence API **paralel** dengan UI; storage & FCM spike |
-| S5–S6 | CI mobile/web; harden development Worker; wiring API |
+| S5–S6 | Harden CI APK / Pages; wiring API klien |
 | S7 | Integrasi & mulai UAT terhadap API development/production |
 | S8 | Production tag release, backup check, evaluasi, dokumentasi final |
 
@@ -477,12 +502,15 @@ Selaras [SDLC §4](./sdlc) (sprint 1 minggu; **BE ∥ UI** sejak S2).
 | 0.1.0 | 2026-09-22 | Draft awal dari proposal capstone Kelompok B |
 | 0.2.0 | 2026-09-23 | Selaraskan dengan backend aktual: Bun/Hono/Drizzle/Neon/Workers, CI, JWT, env trunk-based |
 | 0.2.1 | 2026-09-24 | Rencana infra per sprint 1 minggu; BE∥UI paralel S2–S7 |
+| 0.3.0 | 2026-09-24 | Klien terkunci: web Vue3+CF Pages; mobile RN+Expo+APK CI; Orval/`gh` sync; ADR D-01/D-02/D-10/D-11 |
 
 ---
 
 ## Referensi
 
-- Backend README / AGENTS: [Capstone-Project-Team-B-2026/backend](https://github.com/Capstone-Project-Team-B-2026/backend)
-- Proposal Capstone Project — Pengembangan Aplikasi Absensi Divisi Operation (Kelompok B, 2026)
+- Backend / Web / Mobile README & AGENTS di org [Capstone-Project-Team-B-2026](https://github.com/Capstone-Project-Team-B-2026)
 - [Product Requirements Document (PRD)](./prd)
+- [Development Tools Setup](./dev-setup)
+- [Git Workflow](./git-workflow)
 - [Introduction](./)
+- Proposal Capstone Project — Pengembangan Aplikasi Absensi Divisi Operation (Kelompok B, 2026)

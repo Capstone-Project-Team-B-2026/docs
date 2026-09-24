@@ -12,9 +12,9 @@ title: Software Development Life Cycle (SDLC)
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.1.1 (Draft) |
+| Version | 0.1.3 (Draft) |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
-| Last updated | 2026-09-23 |
+| Last updated | 2026-09-24 |
 
 ---
 
@@ -27,6 +27,8 @@ Dokumen ini mendefinisikan **cara tim bekerja** dari requirement hingga release:
 | [PRD](./prd) | *Apa* yang dibangun (scope, user stories, acceptance) |
 | **SDLC (dokumen ini)** | *Bagaimana* tim membangun & merilis |
 | [Infrastructure](./infrastructure) | *Di mana* sistem berjalan (stack, env, CI/CD) |
+| [Git Workflow](./git-workflow) | *Bagaimana* berkolaborasi di Git/GitHub sehari-hari |
+| [Dev Setup](./dev-setup) | *Bagaimana* menyiapkan tool lokal |
 
 ---
 
@@ -84,7 +86,7 @@ Prinsip kerja:
 |------|-----|
 | Aktivitas | Arsitektur sistem, skema DB, wireframe/UI, kontrak API |
 | Output | [Infrastructure](./infrastructure), [Design System](./design-system), [Screens](./screens), OpenAPI (`/docs` backend) |
-| Gate | Keputusan stack kritis terkunci (backend sudah); mobile/web/face/storage yang masih TBD dijadwalkan spike |
+| Gate | Stack BE/web/mobile terkunci; face/storage/FCM yang masih TBD dijadwalkan spike |
 
 ### 3.3 Implementasi (build)
 
@@ -142,7 +144,7 @@ Diselaraskan dengan milestone PRD. **Satu minggu = satu sprint** di GitHub Proje
 | **S7** | 2026-11-03 | Polish + UAT start | Settings/P2 + mulai UAT | UAT checklist berjalan |
 | **S8** | 2026-11-10 | UAT & Release | Perbaikan UAT, deploy, laporan | Tag release + laporan akhir |
 
-**Urutan layar (board):** bergantung alur Figma (auth → absensi → leave/OT → profil; web: auth → dashboard → approval → laporan → HRD). UI + API layar yang sama satu sprint. Roadmap: [Project view Roadmap](https://github.com/orgs/Capstone-Project-Team-B-2026/projects/2/views/3) (`has:sprint -status:Done`; Group by **Group** untuk swimlane).
+**Urutan layar (board):** bergantung alur Figma (auth → absensi → leave/OT → profil; web: auth → dashboard → approval → laporan → HRD). UI + API layar yang sama satu sprint. Urutan *jenis* kerja: **[Contract]** / **[UI]** (Backlog) dulu, lalu **[Impl]** / **[API]** client (Icebox sampai siap). Roadmap: [Project view Roadmap](https://github.com/orgs/Capstone-Project-Team-B-2026/projects/2/views/3) (`has:sprint -status:Done`; Group by **Group** untuk swimlane).
 
 ```mermaid
 gantt
@@ -202,6 +204,8 @@ Increment dianggap *done* jika:
 
 ## 6. Alur kerja Git & quality gate
 
+Panduan lengkap (naming branch, commit, PR, konflik, multi-repo): **[Git Workflow](./git-workflow)**. Setup tool: [Development Tools Setup](./dev-setup).
+
 ```mermaid
 flowchart TB
   Dev[Branch / commit lokal] --> Hook[Husky pre-commit<br/>eslint + prettier]
@@ -228,8 +232,8 @@ flowchart TB
 |---------|-------|---------------------|
 | Atin Mulyanto | Project Leader & Analyst | Backlog, requirement, koordinasi fase & UAT |
 | Akmal Syarifudin | Backend & Infrastructure | API, DB, face/geofence server-side, CI/CD Workers |
-| Leonardus Sunu Kristianto | Mobile Developer | Android, kamera, GPS, notifikasi klien |
-| Asep Muhammad | UI/UX & Frontend | Figma, design system, web dashboard |
+| Leonardus Sunu Kristianto | Mobile Developer | Android (RN + Expo), kamera, GPS, notifikasi klien |
+| Asep Muhammad | UI/UX & Frontend | Figma, design system, web dashboard (Vue 3) |
 
 RACI ringkas per fase:
 
@@ -278,6 +282,9 @@ Risiko produk (akurasi wajah, GPS, dll.) tetap di [PRD §11](./prd).
 |-------|---------|-----------|
 | 0.1.0 | 2026-09-23 | Draft awal SDLC hybrid Waterfall + Scrum, selaras PRD & infra backend |
 | 0.1.1 | 2026-09-24 | Sprint 1 minggu × 8; build BE∥UI paralel S2–S7; board filter This Sprint |
+| 0.1.2 | 2026-09-24 | Urutan Status board: Contract/UI (Backlog) → Impl/API (Icebox) |
+| 0.1.2 | 2026-09-24 | Tautan ke Git Workflow & Dev Setup |
+| 0.1.3 | 2026-09-24 | Gate desain: stack web/mobile terkunci (Vue Pages + RN Expo) |
 
 ---
 
@@ -287,5 +294,7 @@ Risiko produk (akurasi wajah, GPS, dll.) tetap di [PRD §11](./prd).
 - [Infrastructure Document](./infrastructure)
 - [Design System](./design-system)
 - [Screens & Pages](./screens)
+- [Development Tools Setup](./dev-setup)
+- [Git Workflow](./git-workflow)
 - [Introduction](./)
 - Proposal Capstone Project — Pengembangan Aplikasi Absensi Divisi Operation (Kelompok B, 2026)

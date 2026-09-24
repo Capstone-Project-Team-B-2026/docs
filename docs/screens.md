@@ -6,16 +6,16 @@ title: Screens & Pages
 # Screens & Pages
 
 :::info Status
-**Draft v0.1** — inventaris layar Mobile (M-\*) dan Web (W-\*) untuk MVP Nexus Ops. Sumber: proposal Capstone + [PRD](./prd). Visual token: [Design System](./design-system).
+**Draft v0.1.2** — inventaris layar Mobile (M-\*) dan Web (W-\*). Implementasi: **React Native + Expo** (mobile) · **Vue 3** (web). Sumber: proposal Capstone + [PRD](./prd). Visual token: [Design System](./design-system).
 :::
 
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops |
-| Version | 0.1.0 |
-| Mobile IDs | **M-\*** (karyawan Operation) |
-| Web IDs | **W-\*** (supervisor / HRD / admin) |
-| Last updated | 2026-09-22 |
+| Version | 0.1.2 |
+| Mobile IDs | **M-\*** (karyawan Operation) — RN / Expo |
+| Web IDs | **W-\*** (supervisor / HRD / admin) — Vue 3 |
+| Last updated | 2026-09-24 |
 
 ---
 
@@ -194,9 +194,11 @@ flowchart LR
 
 | Priority | IDs |
 |----------|-----|
-| P0 | M-A01–02, M-H01, M-ATT01–06, M-LV01–04, M-OT01–03, M-N01, W-A01, W-D01–02, W-AP01–03, W-R01–03, W-H01 |
+| P0 | M-A01–03, M-H01, M-ATT01–06, M-LV01–04, M-OT01–03, M-N01, M-P01, W-A01, W-D01–02, W-AP01–03, W-R01–03, W-H01 |
 | P1 | M-ATT07–08, M-H02, M-P03, W-T01–02, W-H02–04 |
 | P2 | M-N02, M-P02/04, W-H05, W-S01–02 |
+
+Urutan kerja per layar/family (board Status): **[Contract]** + **[UI]** = Backlog → **[Impl]** + **[API]** (client wire) = Icebox sampai kontrak/UI siap. Sprint mapping: [SDLC §4](./sdlc).
 
 ---
 
@@ -217,3 +219,5 @@ Lihat README plugin untuk build & load di Figma.
 | Versi | Tanggal | Perubahan |
 |-------|---------|-----------|
 | 0.1.0 | 2026-09-22 | Inventaris awal 26 mobile + 18 web dari proposal/PRD |
+| 0.1.1 | 2026-09-24 | Prioritas P0 + M-A03/M-P01; urutan Status Contract/UI → Impl/API |
+| 0.1.2 | 2026-09-24 | Catatan implementasi: RN+Expo (mobile), Vue 3 (web) |

@@ -6,15 +6,15 @@ title: Design System
 # Nexus Ops Design System
 
 :::info Status
-**Draft v0.1** — token & komponen untuk mobile Android (karyawan) dan web dashboard (supervisor / HRD). Selaras dengan [PRD](./prd) dan [Screens](./screens).
+**Draft v0.1.1** — token & komponen untuk mobile Android (**React Native / Expo**) dan web dashboard (**Vue 3**). Selaras dengan [PRD](./prd) dan [Screens](./screens).
 :::
 
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Absensi Divisi Operation |
-| Version | 0.1.0 |
+| Version | 0.1.1 |
 | Surfaces | Mobile (390×844) · Web dashboard (1280+) |
-| Last updated | 2026-09-22 |
+| Last updated | 2026-09-24 |
 
 ---
 
@@ -232,3 +232,4 @@ Durasi tipikal 150–250ms; easing standard, bukan bounce berlebihan.
 | Versi | Tanggal | Perubahan |
 |-------|---------|-----------|
 | 0.1.0 | 2026-09-22 | Draft awal dari proposal & PRD Kelompok B |
+| 0.1.1 | 2026-09-24 | Catatan permukaan: RN/Expo (mobile), Vue 3 (web) |
