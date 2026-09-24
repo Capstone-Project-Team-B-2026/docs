@@ -115,7 +115,7 @@ sequenceDiagram
 | API client | **Orval** → Axios dari `openapi/openapi.json` |
 | Auth token | AsyncStorage key `nexus_ops_token` *(secure storage OS dapat ditambah nanti)* |
 | Env | `EXPO_PUBLIC_APP_ENV`, `EXPO_PUBLIC_API_BASE_URL` |
-| Quality | ESLint · Prettier · Husky · Jest (`jest-expo`, coverage soft ~40%) |
+| Quality | ESLint · Prettier · Husky · Jest (`jest-expo`, coverage **≥ 95%**) |
 | Artefak | GitHub Actions APK debug (`expo prebuild` → Gradle; folder `android/` tidak di-commit) |
 | Target OS | **Android** (MVP); iOS bundle id sudah di-config, bukan fokus MVP |
 
@@ -129,7 +129,7 @@ Fitur produk (clock-in, kamera, GPS, leave/OT, FCM) menyusul di atas skeleton in
 | Package | **npm** |
 | API client | **Orval** → Axios dari `openapi/openapi.json` |
 | Env | `VITE_APP_ENV`, `VITE_API_BASE_URL`, `VITE_BASE_PATH` |
-| Quality | ESLint · Prettier · Husky · Vitest (coverage soft) |
+| Quality | ESLint · Prettier · Husky · Vitest (coverage **≥ 95%**) |
 | Deploy | **Cloudflare Pages** — trunk-based (`main` → `dev-nexus-ops-web`, tag `v*` → `nexus-ops-web`) |
 
 Fitur produk (monitoring, approval, laporan, HRD) menyusul di atas skeleton ini.
@@ -375,8 +375,8 @@ Lokal: Husky + lint-staged (eslint --fix + prettier) pada pre-commit; juga `open
 
 | Repo | CI | Deploy / artefak |
 |------|----|------------------|
-| **Web** | format · lint · typecheck · test (coverage soft) | `deploy.yml`: `main` → Cloudflare Pages **`dev-nexus-ops-web`** · tag `v*` → **`nexus-ops-web`** |
-| **Mobile** | format · lint · typecheck · test (coverage soft) | `build-apk.yml`: `main` → artifact **`nexus-ops-mobile-dev`** · tag `v*` → **`nexus-ops-mobile-stg`** |
+| **Web** | format · lint · typecheck · coverage **≥ 95%** | `deploy.yml`: `main` → Cloudflare Pages **`dev-nexus-ops-web`** · tag `v*` → **`nexus-ops-web`** |
+| **Mobile** | format · lint · typecheck · coverage **≥ 95%** | `build-apk.yml`: `main` → artifact **`nexus-ops-mobile-dev`** · tag `v*` → **`nexus-ops-mobile-stg`** |
 
 Klien memakai **Orval** dari `openapi/openapi.json`. Sync dari backend private: `npm run api:sync` (`gh api`, bukan raw.githubusercontent). Butuh `gh auth login` + akses repo backend.
 
