@@ -12,7 +12,7 @@ title: Software Development Life Cycle (SDLC)
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.1.5 (Draft) |
+| Version | 0.1.6 (Draft) |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
 | Last updated | 2026-09-24 |
 
@@ -138,11 +138,11 @@ Diselaraskan dengan milestone PRD. **Satu minggu = satu sprint** di GitHub Proje
 |--------|----------------|------|--------------------------|---------|
 | **S1** | 2026-09-22 | Analisis | Wawancara, requirement | PRD v0.2 |
 | **S2** | 2026-09-29 | Kickoff paralel | Auth/shell mobile + web; kontrak API | Login/home/dashboard skeleton |
-| **S3** | 2026-10-06 | Build paralel | Attendance (face/GPS) + Approvals | Clock-in + inbox approve |
-| **S4** | 2026-10-13 | Build paralel | Leave/OT + Reports | Pengajuan + ekspor |
-| **S5** | 2026-10-20 | Build paralel | Profile/notif + HRD users | Enrollment + kelola akun |
-| **S6** | 2026-10-27 | Build + integrasi | Riwayat/history + geofence master | P1 lists & lokasi |
-| **S7** | 2026-11-03 | Polish + UAT start | Settings/P2 + mulai UAT | UAT checklist berjalan |
+| **S3** | 2026-10-06 | Build paralel | Attendance (face/GPS) + Approvals + notif feed UI | Clock-in + inbox approve + M-N01 |
+| **S4** | 2026-10-13 | Build paralel | Leave + Reports + riwayat UI + tim web | Pengajuan leave + ekspor + history UI |
+| **S5** | 2026-10-20 | Build paralel | OT + HRD users + notif API | Lembur + kelola akun + FCM feed |
+| **S6** | 2026-10-27 | Build + integrasi | Geofence master + face enroll + history API | P1 lokasi & enrollment |
+| **S7** | 2026-11-03 | Polish + UAT start | P2 sisa + mulai UAT | UAT checklist berjalan |
 | **S8** | 2026-11-10 | UAT & Release | Perbaikan UAT, deploy, laporan | Tag release + laporan akhir |
 
 **Urutan layar (board):** bergantung alur Figma (auth → absensi → leave/OT → profil; web: auth → dashboard → approval → laporan → HRD). UI + API layar yang sama satu sprint. Urutan *jenis* kerja: **[Contract]** / **[UI]** (Backlog) dulu, lalu **[Impl]** / **[API]** client (Icebox sampai siap). Roadmap: [Project view Roadmap](https://github.com/orgs/Capstone-Project-Team-B-2026/projects/2/views/3) (`has:sprint -status:Done`; Group by **Group** untuk swimlane).
@@ -294,6 +294,7 @@ Risiko produk (akurasi wajah, GPS, dll.) tetap di [PRD §11](./prd).
 | 0.1.3 | 2026-09-24 | Gate desain: stack web/mobile terkunci (Vue Pages + RN Expo) |
 | 0.1.4 | 2026-09-24 | Tim: Moch Riswan Lutfin Anfa; Atin = PL/Analyst + manual tester (`atmcorporation` ≠ `anfariswan`) |
 | 0.1.5 | 2026-09-24 | FCM+R2 terkunci; automation Icebox→Backlog untuk Contract/UI/Test saat sprint mulai |
+| 0.1.6 | 2026-09-24 | Rebalance sprint load (OT/history/enroll) tanpa ganti assignee |
 
 ---
 
