@@ -1,4 +1,5 @@
-# Promote Contract / UI / Test items for started sprints from Icebox → Backlog.
+# Promote Contract / UI items for started sprints from Icebox → Backlog.
+# [Test] stays Icebox until UI + API are ready (manual).
 #
 # Secret required: PROJECT_TOKEN — PAT with Organization Projects (read/write).
 name: Project sprint Backlog promote

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Promote [Contract]/[UI]/[Test] items whose sprint has started: Icebox → Backlog.
+# Promote [Contract]/[UI] items whose sprint has started: Icebox → Backlog.
+# [Test] stays Icebox until UI + API/Impl for that slice are ready (manual move).
 # Also strip GitHub label "Icebox" so Status field is the single source of truth.
 set -euo pipefail
 
@@ -162,7 +163,7 @@ with open("/tmp/to_promote.txt", "a") as out, open("/tmp/strip_labels.txt", "a")
         number = content.get("number")
         if repo and number and "Icebox" in labels and status in ("Backlog", "In progress", "In review", "Done", "Ready"):
             strip.write(f"{repo}\t{number}\n")
-        if status == "Icebox" and sprint_id in due and re.match(r"^\[(Contract|UI|Test)\]", title):
+        if status == "Icebox" and sprint_id in due and re.match(r"^\[(Contract|UI)\]", title):
             out.write(it["id"] + "\n")
             if repo and number and "Icebox" in labels:
                 strip.write(f"{repo}\t{number}\n")

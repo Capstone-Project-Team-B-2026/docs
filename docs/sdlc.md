@@ -63,7 +63,7 @@ Prinsip kerja:
 - **Paralel:** backend, mobile, web sejak S2.
 - Setiap sprint menghasilkan increment demoable.
 - Board: filter **This Sprint** = `sprint:@current -status:Icebox`.
-- **Otomasi:** [`project-sprint-backlog.yml`](https://github.com/Capstone-Project-Team-B-2026/docs/blob/main/.github/workflows/project-sprint-backlog.yml) mempromosikan `[Contract]` / `[UI]` / `[Test]` yang sprint-nya sudah mulai: **Icebox → Backlog**, dan **menghapus label `Icebox`** agar Status field jadi sumber tunggal. Secret: `PROJECT_TOKEN`.
+- **Otomasi:** [`project-sprint-backlog.yml`](https://github.com/Capstone-Project-Team-B-2026/docs/blob/main/.github/workflows/project-sprint-backlog.yml) mempromosikan **`[Contract]` / `[UI]`** yang sprint-nya sudah mulai: **Icebox → Backlog**, dan **menghapus label `Icebox`**. **`[Test]` tidak ikut promote** — tetap Icebox sampai UI + API/Impl slice terkait siap (pindah manual ke Backlog). Secret: `PROJECT_TOKEN`.
 
 ---
 
@@ -129,7 +129,7 @@ Bugfix UAT Minggu 7–8; laporan + presentasi Minggu 8.
 | **S7** | 2026-11-03 | Polish + UAT start | P2 sisa + mulai UAT | UAT checklist berjalan |
 | **S8** | 2026-11-10 | UAT & Release | Perbaikan UAT, deploy, laporan | Tag `v1.0.0` + laporan akhir |
 
-**Urutan jenis kerja:** **[Contract]** / **[UI]** / **[Test]** (Backlog) dulu → **[Impl]** / **[API]** (Icebox sampai siap).
+**Urutan jenis kerja:** **[Contract]** / **[UI]** → Backlog di awal sprint → **[Impl]** / **[API]** (Icebox sampai kontrak/UI siap) → **[Test]** (Icebox sampai UI + wire API siap; lalu Backlog / eksekusi).
 
 ```mermaid
 gantt
@@ -173,6 +173,7 @@ Item siap dikerjakan jika:
 3. Estimasi muat dalam sprint (field **Estimate** di board).
 4. **`[UI]`:** frame Figma ada + daftar **testID** di [Design System §7](./design-system#7-registry-testid--data-testid) + nama token diketahui.
 5. **`[Impl]` / `[API]`:** **`[Contract]`** sudah merge dengan `info.version` OpenAPI naik.
+6. **`[Test]` (manual / E2E):** layar terkait sudah punya UI + client API di `main` (atau env development) sehingga skenario bisa dijalankan tanpa skip massal; checklist/spek boleh ditulis lebih awal di body issue.
 
 ### 5.3 Definition of Done (DoD)
 
@@ -275,6 +276,7 @@ Risiko produk: [PRD §12](./prd).
 | 0.1.0 | 2026-09-23 | Draft awal SDLC |
 | 0.1.1–0.1.6 | 2026-09-24 | Sprint 1 minggu, paralel, FCM/R2, automation, rebalance |
 | 1.0.0 | 2026-09-24 | **Locked:** DoR testID/contract, coverage scope, Playwright CI + Maestro manual, OpenAPI via Deploy publish, Estimate field |
+| 1.0.1 | 2026-09-25 | Otomasi Backlog: hanya `[Contract]`/`[UI]`; `[Test]` Icebox sampai UI+API siap (DoR §5.2) |
 
 ---
 
