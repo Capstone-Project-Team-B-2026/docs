@@ -233,7 +233,7 @@ winget install --id GitHub.cli -e --source winget
 gh auth login
 ```
 
-`npm run api:sync` di web/mobile mengambil `openapi.json` private dari backend lewat `gh api` (bukan raw URL publik).
+`npm run api:sync` di web/mobile mengambil `openapi.json` dari **mirror publik** [`docs/static/openapi.json`](https://raw.githubusercontent.com/Capstone-Project-Team-B-2026/docs/main/static/openapi.json) (tanpa PAT). Opsional: `OPENAPI_SOURCE=backend npm run openapi:sync` lewat `gh api` ke repo private.
 
 ### 4.9 Troubleshooting Windows
 

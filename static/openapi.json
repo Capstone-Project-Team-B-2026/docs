@@ -55,6 +55,46 @@
           "time"
         ]
       },
+      "SupervisorRef": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "Andi Pratama"
+          }
+        },
+        "required": [
+          "id",
+          "fullName"
+        ]
+      },
+      "SiteRef": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "example": "Site A"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
       "PublicUser": {
         "type": "object",
         "properties": {
@@ -79,6 +119,19 @@
           },
           "isActive": {
             "type": "boolean"
+          },
+          "nip": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "104892"
+          },
+          "supervisor": {
+            "$ref": "#/components/schemas/SupervisorRef"
+          },
+          "defaultSite": {
+            "$ref": "#/components/schemas/SiteRef"
           }
         },
         "required": [
@@ -86,7 +139,10 @@
           "email",
           "fullName",
           "role",
-          "isActive"
+          "isActive",
+          "nip",
+          "supervisor",
+          "defaultSite"
         ]
       },
       "LoginResponse": {
@@ -168,6 +224,243 @@
         },
         "required": [
           "user"
+        ]
+      },
+      "ClockStatus": {
+        "type": "string",
+        "enum": [
+          "not_clocked_in",
+          "clocked_in",
+          "clocked_out"
+        ]
+      },
+      "MeTodayShiftBrief": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "example": "Shift Pagi"
+          },
+          "startTime": {
+            "type": "string",
+            "description": "Local time HH:mm",
+            "example": "07:30"
+          },
+          "endTime": {
+            "type": "string",
+            "description": "Local time HH:mm",
+            "example": "16:30"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "startTime",
+          "endTime"
+        ]
+      },
+      "MeTodaySiteBrief": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SiteRef"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "geofenceActive": {
+                "type": "boolean",
+                "example": true
+              }
+            },
+            "required": [
+              "geofenceActive"
+            ]
+          }
+        ]
+      },
+      "PendingRequestType": {
+        "type": "string",
+        "enum": [
+          "leave",
+          "overtime"
+        ]
+      },
+      "PendingRequestStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "approved",
+          "rejected"
+        ]
+      },
+      "PendingRequestSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/PendingRequestType"
+          },
+          "title": {
+            "type": "string",
+            "example": "Izin sakit"
+          },
+          "summary": {
+            "type": "string",
+            "example": "22–23 Sep"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PendingRequestStatus"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "title",
+          "summary",
+          "status"
+        ]
+      },
+      "MeTodayResponse": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-09-22"
+          },
+          "clockStatus": {
+            "$ref": "#/components/schemas/ClockStatus"
+          },
+          "clockInAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "clockOutAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "targetClockIn": {
+            "type": "string",
+            "example": "07:30"
+          },
+          "shift": {
+            "$ref": "#/components/schemas/MeTodayShiftBrief"
+          },
+          "site": {
+            "$ref": "#/components/schemas/MeTodaySiteBrief"
+          },
+          "pendingRequests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PendingRequestSummary"
+            }
+          }
+        },
+        "required": [
+          "date",
+          "clockStatus",
+          "clockInAt",
+          "clockOutAt",
+          "targetClockIn",
+          "shift",
+          "site",
+          "pendingRequests"
+        ]
+      },
+      "MeShiftDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "example": "Shift Pagi"
+          },
+          "daysLabel": {
+            "type": "string",
+            "example": "Senin–Jumat"
+          },
+          "startTime": {
+            "type": "string",
+            "example": "07:30"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "16:30"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "daysLabel",
+          "startTime",
+          "endTime"
+        ]
+      },
+      "MeShiftSite": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SiteRef"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "detailName": {
+                "type": "string",
+                "example": "Site A — Gudang"
+              },
+              "radiusMeters": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "example": 150
+              }
+            },
+            "required": [
+              "detailName",
+              "radiusMeters"
+            ]
+          }
+        ]
+      },
+      "MeShiftResponse": {
+        "type": "object",
+        "properties": {
+          "shift": {
+            "$ref": "#/components/schemas/MeShiftDetail"
+          },
+          "defaultSite": {
+            "$ref": "#/components/schemas/MeShiftSite"
+          },
+          "supervisor": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SupervisorRef"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "required": [
+          "shift",
+          "defaultSite",
+          "supervisor"
         ]
       },
       "DashboardMetrics": {
@@ -469,6 +762,7 @@
           "Auth"
         ],
         "summary": "Profil user terautentikasi",
+        "description": "Includes NIP, supervisor, and default site refs for M-P01 (nullable until Me-context impl).",
         "security": [
           {
             "Bearer": []
@@ -487,6 +781,98 @@
           },
           "401": {
             "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/me/today": {
+      "get": {
+        "tags": [
+          "Me"
+        ],
+        "summary": "Status absensi & ringkas pengajuan hari ini (M-H01)",
+        "description": "Contract stub (S2). AuthZ: any authenticated role (`employee` | `supervisor` | `hrd`). Single payload for home — clock status, target, site/geofence flag, pending leave/OT. Implementation: see backend#2.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Konteks hari ini untuk beranda",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeTodayResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Contract only — use-case belum diimplementasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/me/shift": {
+      "get": {
+        "tags": [
+          "Me"
+        ],
+        "summary": "Detail shift & lokasi default (M-H02)",
+        "description": "Contract stub (S2). AuthZ: any authenticated role (`employee` | `supervisor` | `hrd`). Jam kerja, lokasi default + radius geofence, supervisor. Implementation: see backend#2.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail shift karyawan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeShiftResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Contract only — use-case belum diimplementasi",
             "content": {
               "application/json": {
                 "schema": {

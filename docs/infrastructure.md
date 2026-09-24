@@ -395,17 +395,20 @@ erDiagram
 ### Disiplin kontrak OpenAPI (terkunci)
 
 1. Backend generate `openapi.json` dari Zod; **`info.version` wajib naik** setiap perubahan path/schema.
-2. Publish: release asset backend **dan** salin ke [`docs/static/openapi.json`](https://github.com/Capstone-Project-Team-B-2026/docs/blob/main/static/openapi.json) (URL publik GitHub Pages) supaya CI FE tidak butuh PAT ke repo private.
-3. Web/mobile: `npm run api:sync` → Orval. Job CI: sync lalu `git diff --exit-code openapi/ src/api/` — klien basi **gagal CI**.
+2. Publish: release asset backend **dan** mirror publik [`docs/static/openapi.json`](https://github.com/Capstone-Project-Team-B-2026/docs/blob/main/static/openapi.json).
+   - Otomatis: workflow docs [`sync-openapi.yml`](https://github.com/Capstone-Project-Team-B-2026/docs/blob/main/.github/workflows/sync-openapi.yml) (cron 6 jam + `repository_dispatch` `openapi-updated` dari backend CI).
+   - Secret: `PROJECT_TOKEN` di repo **docs** (dan opsional di **backend** untuk dispatch setelah push `main`).
+3. Web/mobile: `npm run api:sync` (default curl mirror publik, tanpa PAT) → Orval. Job CI: sync + generate lalu `git diff --exit-code openapi/ src/api/` — klien basi **gagal CI**.
+4. Design tokens: `docs/static/tokens.json` → `npm run tokens:sync` di web (`src/styles/tokens.ts`) / mobile (`src/theme/tokens.ts`).
 
 ### Pipeline
 
 | Repo | CI | Deploy / artefak |
 |------|----|------------------|
 | **Backend** | format · lint · tsc · unit coverage ≥95% · **integration** (postgres service + `drizzle-kit push` + `app.request`) | `main` → Worker dev · `v*` → prod |
-| **Web** | format · lint · tsc · unit ≥95% (`src/lib`) · **E2E Playwright** (mock API) · OpenAPI drift check | Pages `dev-nexus-ops-web` / `nexus-ops-web` |
-| **Mobile** | format · lint · tsc · unit ≥95% (`src/lib`) · OpenAPI drift check | APK artifact; **Maestro = gate manual** (bukan CI) |
-| **Docs** | Docusaurus build · `project-sprint-backlog.yml` (cron + dispatch) | GitHub Pages |
+| **Web** | format · lint · tsc · unit ≥95% (`src/lib`) · **OpenAPI anti-drift** · **E2E Playwright smoke** | Pages `dev-nexus-ops-web` / `nexus-ops-web` |
+| **Mobile** | format · lint · tsc · unit ≥95% (`src/lib`) · **OpenAPI anti-drift** | APK artifact; **Maestro = gate manual** (bukan CI) |
+| **Docs** | Docusaurus build · `project-sprint-backlog.yml` · **`sync-openapi.yml`** | GitHub Pages |
 
 ```mermaid
 flowchart TB

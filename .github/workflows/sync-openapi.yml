@@ -1,0 +1,44 @@
+# Mirror private backend openapi.json → static/openapi.json (public for FE CI).
+#
+# Secret: PROJECT_TOKEN — PAT with read on private backend + contents write on docs
+# (same token as project-sprint-backlog.yml is fine if scopes include repo).
+name: Sync OpenAPI mirror
+
+on:
+  schedule:
+    - cron: "20 */6 * * *"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [openapi-updated]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-openapi
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync from backend
+        id: sync
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+          ORG: Capstone-Project-Team-B-2026
+          OPENAPI_REF: main
+        run: bash .github/scripts/sync-openapi.sh
+
+      - name: Commit mirror if changed
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add static/openapi.json
+          git commit -m "chore: sync openapi.json mirror from backend
+
+          Public mirror for web/mobile CI anti-drift (no PAT to private backend)."
+          git push origin HEAD
