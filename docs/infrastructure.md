@@ -112,7 +112,7 @@ sequenceDiagram
 | Dev client | **Expo Go tidak cukup** untuk face/camera native — wajib **dev client / debug APK** (`expo prebuild`) |
 | Env | `EXPO_PUBLIC_APP_ENV`, `EXPO_PUBLIC_API_BASE_URL` |
 | Quality | ESLint · Prettier · Husky · Jest (`src/lib` coverage **≥ 95%**) · **E2E Maestro** (manual gate vs APK; bukan CI) |
-| Artefak | GitHub Actions APK debug (`expo prebuild` → Gradle; folder `android/` tidak di-commit) |
+| Artefak | GitHub Actions APK: **nightly** → dev · tag `v*` → stg · manual dispatch (`android/` tidak di-commit) |
 | Target OS | **Android** (MVP) |
 
 ### 3.2 Web dashboard *(bootstrapped)*
@@ -408,7 +408,7 @@ erDiagram
 |------|----|------------------|
 | **Backend** | format · lint · tsc · unit coverage ≥95% | `main` → Worker dev + **publish OpenAPI → docs** · `v*` → prod |
 | **Web** | format · lint · tsc · unit ≥95% (`src/lib`) · **E2E Playwright smoke** | Pages `dev-nexus-ops-web` / `nexus-ops-web` |
-| **Mobile** | format · lint · tsc · unit ≥95% (`src/lib`) | APK artifact; **Maestro = gate manual** (bukan CI) |
+| **Mobile** | format · lint · tsc · unit ≥95% (`src/lib`) | APK: **nightly** → `nexus-ops-mobile-dev` · tag `v*` → stg · Maestro manual |
 | **Docs** | Docusaurus build · `project-sprint-backlog.yml` | GitHub Pages · `static/openapi.json` diisi oleh backend deploy |
 
 ```mermaid
@@ -468,7 +468,7 @@ flowchart TB
 
 | ID | Keputusan | Status | Catatan |
 |----|-----------|--------|---------|
-| D-01 | Stack mobile | **Dipilih** | RN + Expo 57 · Expo Router · Orval · APK via Actions · **dev client** untuk face |
+| D-01 | Stack mobile | **Dipilih** | RN + Expo 57 · Orval · APK nightly/tag · **dev client** untuk face |
 | D-02 | Stack web | **Dipilih** | Vue 3 + Vite · Orval · Cloudflare Pages · Playwright |
 | D-03 | Stack API | **Dipilih** | Bun + Hono + Zod OpenAPI + DDD |
 | D-04 | Database | **Dipilih** | Neon PostgreSQL + Drizzle |
