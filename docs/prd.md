@@ -6,13 +6,13 @@ title: Product Requirements Document (PRD)
 # Product Requirements Document (PRD)
 
 :::info Status
-**Draft** — disusun dari Proposal Capstone Project Kelompok B (STSI4440, 2026). Konten akan diperbarui setelah analisis kebutuhan dan wawancara pengguna selesai.
+**v0.2.0 — Keputusan domain terkunci (2026-09-24)** untuk MVP semester ini. Wawancara lapangan boleh menambah *catatan*, tetapi perubahan rule di bawah memerlukan update PRD + persetujuan Project Leader.
 :::
 
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.1.3 (Draft) |
+| Version | 0.2.0 |
 | Mata Kuliah | STSI4440 |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
 | Last updated | 2026-09-24 |
@@ -53,7 +53,7 @@ Satu platform absensi yang akurat, aman, dan terpantau secara real-time — dari
 | Adoption UAT | ≥ 80% skenario utama lulus | Karyawan + supervisor + HRD |
 | Latency notifikasi | &lt; 1 menit setelah event | Status izin/cuti, pengingat |
 
-*Metrik final akan dikunci setelah wawancara pengguna (Minggu 1).*
+*Metrik di atas dipakai sebagai target UAT; rule domain pendukung ada di [§10](#10-keputusan-domain-terkunci-mvp).*
 
 ---
 
@@ -102,6 +102,12 @@ flowchart TB
 | Integrasi payroll | Hanya ekspor data; tidak sinkron langsung ke sistem payroll existing |
 | Platform mobile | Fokus Android (iOS dapat dipertimbangkan kemudian) |
 | Storage | Database lokal/cloud perusahaan sesuai keputusan infrastruktur |
+| Face override supervisor | **CUT MVP** — absensi gagal face tetap retry / hubungi HRD re-enroll |
+| Lupa password self-service | **CUT MVP** — reset oleh HRD lewat kelola akun |
+| Kuota/saldo cuti | **CUT MVP** — jenis leave enum saja |
+| Roster shift per karyawan | **CUT MVP** — satu default shift organisasi |
+| Approve di mobile | **CUT MVP** — supervisor approve hanya di web |
+| Quiet hours / FCM penuh | Preferensi lanjut & channel FCM = P2; MVP cukup in-app notification feed |
 
 ---
 
@@ -279,53 +285,117 @@ Metodologi: Waterfall untuk kerangka tahapan, **Agile Scrum (sprint 1 minggu)**;
 
 ---
 
-## 10. Acceptance criteria (MVP)
+## 10. Keputusan domain terkunci (MVP)
+
+Aturan berikut mengunci perilaku produk untuk semester ini. Kontrak API, UI, dan checklist tes manual harus merujuk ke sini.
+
+### 10.1 Absensi & status hari
+
+| Aturan | Keputusan |
+|--------|-----------|
+| Status **Hadir** | Clock-in valid (wajah + GPS) |
+| Status **Terlambat** | Clock-in valid setelah `default_shift_start + grace 15 menit` |
+| Status **Alpha** | Tidak ada clock-in valid dan tidak ada leave approved pada hari itu |
+| Status **Izin** | Leave approved mencakup hari tersebut |
+| Clock-in & clock-out | Keduanya wajib **wajah + GPS** (satu alur `M-ATT*`) |
+| Lupa clock-out | Boleh clock-out sampai **clock-in berikutnya**; tanpa auto-close / override supervisor |
+| Shift | **Satu default shift organisasi** (`W-S01`); tanpa roster per karyawan |
+| Geofence | Valid jika di **salah satu** lokasi aktif org; radius default **100 m**; akurasi GPS maks **50 m** |
+| Retry face/GPS | Maks **3** per percobaan absensi |
+| Face override | **Tidak ada** di MVP |
+
+### 10.2 Face enrollment
+
+| Aturan | Keputusan |
+|--------|-----------|
+| Siapa enroll | Karyawan self-enroll di `M-P03` |
+| Jumlah foto | **3** foto jelas → embedding disimpan |
+| Approve HRD atas template | Tidak wajib |
+| Snapshot verifikasi | Opsional / retensi singkat; yang wajib adalah embedding |
+
+### 10.3 Izin, cuti, lembur, approval
+
+| Aturan | Keputusan |
+|--------|-----------|
+| Jenis leave MVP | Enum: **Sakit** \| **Cuti** \| **Izin lain** |
+| Kuota/saldo | Tidak dihitung di MVP |
+| Pending | Boleh **batal**; tidak boleh edit |
+| Overlap leave vs absensi valid | Tolak pengajuan |
+| OT | Tanggal + jam mulai/selesai; **maks 4 jam** (hard reject); tidak wajib link ke record absensi |
+| Approve | **Hanya web** (`W-AP*`) |
+| Tolak | **Wajib alasan** (teks singkat) |
+
+### 10.4 Master data & laporan
+
+| Aturan | Keputusan |
+|--------|-----------|
+| User P0 fields | `email`, `full_name`, `role`, `is_active`, password awal; `supervisor_id` opsional |
+| Site/shift per user | Defer; geofence org-wide + default shift org |
+| Ekspor laporan | Kolom: NIP, nama, tanggal, masuk, keluar, status, jenis leave, jam OT |
+| Format | **Excel wajib MVP**; PDF nice-to-have di sprint yang sama bila muat |
+
+### 10.5 Auth & notifikasi
+
+| Aturan | Keputusan |
+|--------|-----------|
+| Lupa password self-service | **CUT** (reset HRD) |
+| Notifikasi P0 | In-app feed + push status approval bila FCM siap |
+| Quiet hours / preferensi lanjut | P2 |
+
+---
+
+## 11. Acceptance criteria (MVP)
 
 MVP dianggap selesai bila:
 
-1. Karyawan dapat clock-in/out dengan validasi wajah **dan** GPS pada Android.
-2. Pengajuan izin/cuti/lembur dapat di-approve/reject supervisor dengan notifikasi.
-3. Dashboard menampilkan kehadiran harian dan rekap periode.
-4. HRD dapat mengunduh laporan PDF atau Excel.
-5. Role access membatasi fitur sesuai persona.
-6. UAT skenario utama (draft checklist) lulus sesuai target adoption.
+1. Karyawan dapat clock-in/out dengan validasi wajah **dan** GPS pada Android (aturan §10.1).
+2. Pengajuan izin/cuti/lembur dapat di-approve/reject supervisor di **web** dengan **alasan wajib saat tolak** + notifikasi ke karyawan.
+3. Dashboard menampilkan kehadiran harian dan rekap periode (status Hadir/Terlambat/Alpha/Izin).
+4. HRD dapat mengunduh laporan **Excel** (PDF opsional) dengan kolom §10.4.
+5. Role access membatasi fitur sesuai persona (`employee` / `supervisor` / `hrd`).
+6. Checklist tes manual (card `[Test]` di board, owner Atin) untuk skenario utama lulus sesuai target adoption.
 
 ---
 
-## 11. Risiko & mitigasi (draft)
+## 12. Risiko & mitigasi
 
 | Risiko | Dampak | Mitigasi |
 |--------|--------|----------|
-| Akurasi face recognition rendah di lapangan | Absensi gagal / false reject | Threshold tunable; fallback approval supervisor (P1) |
-| GPS tidak akurat / indoor | Geofence gagal | Radius geofence cukup; logging reason code |
+| Akurasi face recognition rendah di lapangan | Absensi gagal / false reject | Threshold tunable + retry 3×; re-enroll HRD/karyawan — **tanpa** override supervisor di MVP |
+| GPS tidak akurat / indoor | Geofence gagal | Radius default 100 m; reject + reason code; log akurasi |
 | Scope creep fitur payroll penuh | Telat delivery | Kunci batasan: hanya ekspor |
-| Ketersediaan stakeholder UAT | Feedback terlambat | Jadwalkan UAT di Minggu 7 sejak awal |
-| Integrasi FCM / storage | Notifikasi / upload gagal | Spike teknis di sprint awal backend |
+| Ketersediaan stakeholder UAT | Feedback terlambat | Jadwalkan UAT di Minggu 7; Atin jalankan tes manual per sprint |
+| Integrasi FCM / storage | Notifikasi / upload gagal | Spike di sprint awal; fallback in-app feed |
 
 ---
 
-## 12. Tim & RACI ringkas
+## 13. Tim & RACI ringkas
 
-| Anggota | Peran |
-|---------|-------|
-| Atin Mulyanto | Project Leader & Analyst — requirement, koordinasi |
-| Akmal Syarifudin | Backend Developer & Infrastructure — API, DB, face recognition, geofencing, deployment, CI/CD |
-| Leonardus Sunu Kristianto | Mobile Developer — Android, kamera, GPS, notifikasi |
-| Asep Muhammad | UI/UX & Frontend — Figma, web dashboard admin |
+| Anggota | GitHub | Peran |
+|---------|--------|-------|
+| Atin Mulyanto | [`atmcorporation`](https://github.com/atmcorporation) | Project Leader & Analyst — requirement, koordinasi, **manual tester** (card `[Test]`) |
+| Akmal Syarifudin | [`akmalsyrf`](https://github.com/akmalsyrf) | Backend & Infrastructure — API, DB, face/geofence server-side, CI/CD |
+| Leonardus Sunu Kristianto | [`leokrist`](https://github.com/leokrist) | Mobile Developer — auth/home, absensi (kamera + GPS), profil/enrollment |
+| Asep Muhammad | [`asepmuhamad1300-ctrl`](https://github.com/asepmuhamad1300-ctrl) | UI/UX & Web Frontend — Figma/design system, dashboard admin Vue |
+| Moch Riswan Lutfin Anfa | [`anfariswan`](https://github.com/anfariswan) | Mobile & Web Frontend — leave/OT/notif mobile; geofence & sebagian halaman web pendukung |
+
+:::note
+`atmcorporation` (Atin) ≠ `anfariswan` (Anfa). Jangan menukar assignee board antara keduanya.
+:::
 
 ---
 
-## 13. Luaran terkait
+## 14. Luaran terkait
 
 - Aplikasi mobile absensi (Android)
 - Web dashboard admin
 - Backend RESTful API
 - Dokumentasi teknis (arsitektur, API spec, panduan)
-- Laporan proyek + presentasi/demo
+- Checklist tes manual + laporan proyek + presentasi/demo
 
 ---
 
-## 14. Riwayat revisi
+## 15. Riwayat revisi
 
 | Versi | Tanggal | Perubahan |
 |-------|---------|-----------|
@@ -333,6 +403,7 @@ MVP dianggap selesai bila:
 | 0.1.1 | 2026-09-23 | Dependensi backend diselaraskan ke stack aktual (Infra v0.2) |
 | 0.1.2 | 2026-09-24 | Milestone sprint 1 minggu; BE∥UI paralel sejak S2 |
 | 0.1.3 | 2026-09-24 | Dependensi web (Vue/CF Pages) & mobile (RN+Expo) terkunci |
+| 0.2.0 | 2026-09-24 | Kunci keputusan domain MVP; tim lengkap (Atin + Anfa); Atin = PL/Analyst + manual tester; cut face override / lupa password / kuota |
 
 ---
 

@@ -8,11 +8,23 @@ title: Introduction
 
 Dokumentasi Capstone Project 50 Team B 2026 — **Aplikasi Absensi Divisi Operation**.
 
+## Tim
+
+| Anggota | GitHub | Peran |
+|---------|--------|-------|
+| Atin Mulyanto | [`atmcorporation`](https://github.com/atmcorporation) | Project Leader & Analyst + Manual Tester |
+| Akmal Syarifudin | [`akmalsyrf`](https://github.com/akmalsyrf) | Backend & Infrastructure |
+| Leonardus Sunu Kristianto | [`leokrist`](https://github.com/leokrist) | Mobile (auth, absensi, profil) |
+| Asep Muhammad | [`asepmuhamad1300-ctrl`](https://github.com/asepmuhamad1300-ctrl) | UI/UX & Web dashboard |
+| Moch Riswan Lutfin Anfa | [`anfariswan`](https://github.com/anfariswan) | Mobile (leave/OT/notif) & web pendukung |
+
+Keputusan domain MVP terkunci di [PRD §10](./prd#10-keputusan-domain-terkunci-mvp). Board: [Project #2](https://github.com/orgs/Capstone-Project-Team-B-2026/projects/2).
+
 ## Dokumen utama
 
 | Dokumen | Status | Deskripsi |
 |---------|--------|-----------|
-| [Product Requirements Document (PRD)](./prd) | Draft | Kebutuhan produk, scope, user stories, acceptance criteria |
+| [Product Requirements Document (PRD)](./prd) | **v0.2.0** (keputusan domain terkunci) | Kebutuhan produk, scope, user stories, acceptance criteria |
 | [Software Development Life Cycle (SDLC)](./sdlc) | Draft | Proses hybrid Waterfall + Scrum, fase, DoD, release |
 | [Infrastructure Document](./infrastructure) | Draft v0.3 | Stack terkunci: BE Workers · web CF Pages · mobile Expo/RN |
 | [Design System](./design-system) | Draft | Token warna, tipografi, komponen, pola UI |

@@ -6,13 +6,13 @@ title: Design System
 # Nexus Ops Design System
 
 :::info Status
-**Draft v0.1.1** — token & komponen untuk mobile Android (**React Native / Expo**) dan web dashboard (**Vue 3**). Selaras dengan [PRD](./prd) dan [Screens](./screens).
+**Draft v0.1.2** — token & komponen untuk mobile Android (**React Native / Expo**) dan web dashboard (**Vue 3**). Selaras dengan [PRD §10](./prd#10-keputusan-domain-terkunci-mvp) dan [Screens](./screens).
 :::
 
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Absensi Divisi Operation |
-| Version | 0.1.1 |
+| Version | 0.1.2 |
 | Surfaces | Mobile (390×844) · Web dashboard (1280+) |
 | Last updated | 2026-09-24 |
 
@@ -173,13 +173,17 @@ Angka besar + label untuk dashboard (Hadir, Terlambat, Belum absen, On leave).
 - Body scroll, padding 20
 - Tab bar tetap (kecuali alur auth / camera fullscreen)
 
-### 6.2 Clock-in flow
+### 6.2 Clock-in / clock-out flow
 
-1. Hub absensi → 2. Capture wajah → 3. Validasi GPS (boleh paralel UX) → 4. Sukses / gagal dengan reason
+1. Hub absensi (pilih **Clock-in** atau **Clock-out**) → 2. Capture wajah → 3. Validasi GPS → 4. Sukses / gagal dengan reason
 
-Gagal: tampilkan alasan + CTA “Coba lagi”; jangan silent fail.
+Gagal: tampilkan alasan + CTA “Coba lagi” (maks 3); jangan silent fail; **tanpa** tombol override supervisor.
 
-### 6.3 Web shell
+### 6.3 Approval reject
+
+Di web `W-AP02` / `W-AP03`: aksi Tolak menampilkan field **Alasan penolakan** (wajib) sebelum konfirmasi.
+
+### 6.4 Web shell
 
 Sidebar 240px + top bar (periode, role, avatar) + main content max-width nyaman untuk tabel.
 
@@ -233,3 +237,4 @@ Durasi tipikal 150–250ms; easing standard, bukan bounce berlebihan.
 |-------|---------|-----------|
 | 0.1.0 | 2026-09-22 | Draft awal dari proposal & PRD Kelompok B |
 | 0.1.1 | 2026-09-24 | Catatan permukaan: RN/Expo (mobile), Vue 3 (web) |
+| 0.1.2 | 2026-09-24 | Pola clock-out + reject reason wajib; selaras PRD v0.2 |

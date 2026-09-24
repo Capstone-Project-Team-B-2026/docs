@@ -12,7 +12,7 @@ title: Software Development Life Cycle (SDLC)
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.1.3 (Draft) |
+| Version | 0.1.4 (Draft) |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
 | Last updated | 2026-09-24 |
 
@@ -228,12 +228,17 @@ flowchart TB
 
 ## 7. Peran & tanggung jawab
 
-| Anggota | Peran | Tanggung jawab SDLC |
-|---------|-------|---------------------|
-| Atin Mulyanto | Project Leader & Analyst | Backlog, requirement, koordinasi fase & UAT |
-| Akmal Syarifudin | Backend & Infrastructure | API, DB, face/geofence server-side, CI/CD Workers |
-| Leonardus Sunu Kristianto | Mobile Developer | Android (RN + Expo), kamera, GPS, notifikasi klien |
-| Asep Muhammad | UI/UX & Frontend | Figma, design system, web dashboard (Vue 3) |
+| Anggota | GitHub | Peran | Tanggung jawab SDLC |
+|---------|--------|-------|---------------------|
+| Atin Mulyanto | `atmcorporation` | Project Leader & Analyst + **Manual Tester** | Backlog, requirement, koordinasi fase, card `[Test]`, sign-off UAT |
+| Akmal Syarifudin | `akmalsyrf` | Backend & Infrastructure | API, DB, face/geofence server-side, CI/CD Workers |
+| Leonardus Sunu Kristianto | `leokrist` | Mobile Developer | Auth/home, absensi (kamera + GPS), profil/enrollment |
+| Asep Muhammad | `asepmuhamad1300-ctrl` | UI/UX & Web Frontend | Figma, design system, web dashboard (Vue 3) |
+| Moch Riswan Lutfin Anfa | `anfariswan` | Mobile & Web Frontend | Leave/OT/notif mobile; geofence & halaman web pendukung |
+
+:::note
+`atmcorporation` (Atin) ≠ `anfariswan` (Anfa).
+:::
 
 RACI ringkas per fase:
 
@@ -242,9 +247,10 @@ RACI ringkas per fase:
 | Analisis / PRD | Atin | Tim (input persona & teknis) |
 | Desain UI | Asep | Atin (review AC) |
 | Backend | Akmal | — |
-| Mobile | Leonardus | Akmal (kontrak API) |
-| Web | Asep | Akmal (kontrak API) |
-| UAT | Atin | Seluruh tim |
+| Mobile (absensi/auth) | Leonardus | Akmal (kontrak API) |
+| Mobile (leave/OT/notif) | Anfa | Akmal (kontrak API) |
+| Web | Asep (+ Anfa pada area yang di-assign) | Akmal (kontrak API) |
+| Tes manual / UAT checklist | Atin | Seluruh tim (fix bug) |
 | Release | Akmal (tag/deploy) | Atin (sign-off scope) |
 
 ---
@@ -285,6 +291,7 @@ Risiko produk (akurasi wajah, GPS, dll.) tetap di [PRD §11](./prd).
 | 0.1.2 | 2026-09-24 | Urutan Status board: Contract/UI (Backlog) → Impl/API (Icebox) |
 | 0.1.2 | 2026-09-24 | Tautan ke Git Workflow & Dev Setup |
 | 0.1.3 | 2026-09-24 | Gate desain: stack web/mobile terkunci (Vue Pages + RN Expo) |
+| 0.1.4 | 2026-09-24 | Tim: Moch Riswan Lutfin Anfa; Atin = PL/Analyst + manual tester (`atmcorporation` ≠ `anfariswan`) |
 
 ---
 

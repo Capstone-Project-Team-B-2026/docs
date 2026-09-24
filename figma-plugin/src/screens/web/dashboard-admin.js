@@ -73,6 +73,7 @@ export function generateWebAll(page, positions) {
     content.appendChild(sectionTitle('Izin sakit — Budi Santoso', '22–23 Sep 2026'));
     content.appendChild(wrapTxt('Demam, istirahat di rumah.', 14, 'Regular', C.ink700));
     content.appendChild(kvRow('Diajukan', '21 Sep · 18:02'));
+    content.appendChild(inputField('Alasan penolakan (wajib jika tolak)', 'Contoh: overlapping absensi'));
     const actions = row('Actions', 12);
     stretch(actions);
     const a = cta('Setujui', C.success);
@@ -90,6 +91,7 @@ export function generateWebAll(page, positions) {
     content.appendChild(sectionTitle('Lembur — Citra Lestari', '19 Sep · 2.0 jam'));
     content.appendChild(kvRow('Jam', '16:30 – 18:30'));
     content.appendChild(kvRow('Keterangan', 'Penyelesaian loading'));
+    content.appendChild(inputField('Alasan penolakan (wajib jika tolak)', 'Contoh: melebihi kebijakan'));
     content.appendChild(cta('Setujui', C.success));
     content.appendChild(ghostCta('Tolak'));
   });
@@ -139,14 +141,14 @@ export function generateWebAll(page, positions) {
     last(content).appendChild(txt('104892 · Budi · 22/09 · 07:28 · — · Hadir · 0', 12, 'Regular', C.ink700));
     const actions = row('Export', 12);
     stretch(actions);
-    const pdf = cta('Unduh PDF', C.primary);
-    pdf.layoutAlign = 'INHERIT';
-    pdf.primaryAxisSizingMode = 'AUTO';
-    const xls = secondaryCta('Unduh Excel');
+    const xls = cta('Unduh Excel', C.primary);
     xls.layoutAlign = 'INHERIT';
     xls.primaryAxisSizingMode = 'AUTO';
-    actions.appendChild(pdf);
+    const pdf = secondaryCta('Unduh PDF (opsional)');
+    pdf.layoutAlign = 'INHERIT';
+    pdf.primaryAxisSizingMode = 'AUTO';
     actions.appendChild(xls);
+    actions.appendChild(pdf);
     content.appendChild(actions);
   });
 
@@ -158,24 +160,27 @@ export function generateWebAll(page, positions) {
   });
 
   put('W-H02', 'Form pengguna', 'Karyawan', 'app', ({ content }) => {
-    content.appendChild(inputField('Nama', 'Nama lengkap'));
-    content.appendChild(inputField('Email / NIP', ''));
+    content.appendChild(inputField('Nama lengkap', 'Budi Santoso'));
+    content.appendChild(inputField('Email', 'budi@perusahaan.com'));
+    content.appendChild(inputField('Password awal', '••••••••'));
     content.appendChild(inputField('Role', 'Karyawan / Supervisor / HRD', 'Karyawan'));
-    content.appendChild(inputField('Status', 'Aktif', 'Aktif'));
+    content.appendChild(inputField('Status', 'Aktif / Nonaktif', 'Aktif'));
+    content.appendChild(inputField('Supervisor (opsional)', 'Andi Pratama'));
     content.appendChild(cta('Simpan', C.primary));
   });
 
   put('W-H03', 'Lokasi & geofence', 'Lokasi', 'app', ({ content }) => {
     content.appendChild(cta('Tambah lokasi', C.primary));
-    content.appendChild(listRow('Site A — Gudang', 'Radius 150 m', '›'));
-    content.appendChild(listRow('Site B — Pool', 'Radius 200 m', '›'));
+    content.appendChild(listRow('Site A — Gudang', 'Radius 100 m · Aktif', '›'));
+    content.appendChild(listRow('Site B — Pool', 'Radius 100 m · Aktif', '›'));
+    content.appendChild(wrapTxt('Clock-in valid di salah satu lokasi aktif.', 12, 'Regular', C.ink500));
   });
 
   put('W-H04', 'Form lokasi', 'Lokasi', 'app', ({ content }) => {
     content.appendChild(inputField('Nama', 'Site A — Gudang'));
     content.appendChild(inputField('Latitude', '-6.200'));
     content.appendChild(inputField('Longitude', '106.816'));
-    content.appendChild(inputField('Radius (m)', '150'));
+    content.appendChild(inputField('Radius (m)', '100'));
     content.appendChild(cta('Simpan lokasi', C.primary));
   });
 
@@ -189,6 +194,7 @@ export function generateWebAll(page, positions) {
     content.appendChild(inputField('Nama organisasi', 'Divisi Operation'));
     content.appendChild(inputField('Timezone', 'Asia/Jakarta'));
     content.appendChild(inputField('Default shift start', '07:30'));
+    content.appendChild(inputField('Grace terlambat (menit)', '15'));
     content.appendChild(cta('Simpan', C.primary));
   });
 

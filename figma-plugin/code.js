@@ -854,7 +854,7 @@
       body.appendChild(inputField("Email / NIP", "nip@perusahaan.com"));
       body.appendChild(inputField("Kata sandi", "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"));
       body.appendChild(cta("Masuk", C.primary));
-      body.appendChild(ghostCta("Lupa kata sandi?"));
+      body.appendChild(wrapTxt("Lupa sandi? Hubungi HRD untuk reset akun.", 12, "Regular", C.ink500));
     });
     put("M-A03", "Sesi berakhir", { hideNav: true, showMetrics: false }, ({ body }) => {
       body.appendChild(banner("Sesi berakhir demi keamanan. Silakan masuk lagi.", C.warningSoft, C.warning));
@@ -875,7 +875,8 @@
       body.appendChild(kvRow("Jam kerja", "07:30 \u2013 16:30"));
       body.appendChild(kvRow("Lokasi default", "Site A \u2014 Gudang"));
       body.appendChild(kvRow("Supervisor", "Andi Pratama"));
-      body.appendChild(kvRow("Radius geofence", "150 m"));
+      body.appendChild(kvRow("Radius geofence", "100 m (default org)"));
+      body.appendChild(kvRow("Grace terlambat", "15 menit"));
     });
   }
   function generateMobileAttendance(page, positions) {
@@ -885,13 +886,14 @@
       return wrap;
     };
     put("M-ATT01", "Hub absensi", { tab: "Absensi" }, ({ body }) => {
-      body.appendChild(sectionTitle("Absensi hari ini", "Clock-in dan clock-out dengan validasi wajah & GPS"));
+      body.appendChild(sectionTitle("Absensi hari ini", "Clock-in & clock-out \u2014 keduanya wajah + GPS"));
       body.appendChild(metricRow([
         ["\u2014", "Masuk", C.ink500],
         ["\u2014", "Keluar", C.ink500]
       ]));
       body.appendChild(cta("Clock-in", C.primary));
-      body.appendChild(secondaryCta("Lihat riwayat"));
+      body.appendChild(secondaryCta("Clock-out"));
+      body.appendChild(ghostCta("Lihat riwayat"));
     });
     put("M-ATT02", "Capture wajah", { hideNav: true, showMetrics: true }, ({ body }) => {
       body.appendChild(sectionTitle("Verifikasi wajah", "Pastikan pencahayaan cukup"));
@@ -961,7 +963,7 @@
       body.appendChild(listRow("Izin keluarga", "12 Jul", pill("Ditolak", C.errorSoft, C.error)));
     });
     put("M-LV02", "Form ajukan izin", { tab: "Pengajuan", hideNav: true }, ({ body }) => {
-      body.appendChild(inputField("Jenis", "Izin sakit / Cuti / Lainnya", "Izin sakit"));
+      body.appendChild(inputField("Jenis", "Sakit / Cuti / Izin lain", "Sakit"));
       body.appendChild(inputField("Tanggal mulai", "YYYY-MM-DD", "2026-09-22"));
       body.appendChild(inputField("Tanggal selesai", "YYYY-MM-DD", "2026-09-23"));
       body.appendChild(inputField("Keterangan", "Alasan singkat"));
@@ -990,6 +992,7 @@
       body.appendChild(inputField("Tanggal", "YYYY-MM-DD", "2026-09-22"));
       body.appendChild(inputField("Jam mulai", "16:30"));
       body.appendChild(inputField("Jam selesai", "18:30"));
+      body.appendChild(wrapTxt("Maksimal 4 jam per pengajuan.", 12, "Regular", C.ink500));
       body.appendChild(inputField("Keterangan", "Penyelesaian loading"));
       body.appendChild(cta("Kirim", C.primary));
     });
@@ -1002,7 +1005,7 @@
     put("M-N01", "Pusat notifikasi", { tab: "Beranda", hideNav: false }, ({ body }) => {
       body.appendChild(listRow("Izin disetujui", "Cuti 1\u20135 Agu \xB7 baru saja", "\u203A"));
       body.appendChild(listRow("Pengingat clock-in", "Shift mulai 07:30", "\u203A"));
-      body.appendChild(listRow("Lembur ditolak", "Alasan: kuota penuh", "\u203A"));
+      body.appendChild(listRow("Lembur ditolak", "Alasan: melebihi 4 jam", "\u203A"));
     });
     put("M-N02", "Preferensi notifikasi", { tab: "Profil" }, ({ body }) => {
       body.appendChild(listRow("Pengingat absensi", "Sebelum shift", "On"));
@@ -1024,7 +1027,7 @@
     });
     put("M-P03", "Enrollment wajah", { tab: "Profil", hideNav: true }, ({ body }) => {
       body.appendChild(sectionTitle("Daftarkan wajah", "Dipakai untuk verifikasi absensi"));
-      body.appendChild(faceFrame("Ambil 1\u20133 foto jelas"));
+      body.appendChild(faceFrame("Ambil 3 foto jelas"));
       body.appendChild(cta("Simpan template", C.primary));
     });
     put("M-P04", "Bantuan", { tab: "Profil" }, ({ body }) => {
@@ -1222,6 +1225,7 @@
       content.appendChild(sectionTitle("Izin sakit \u2014 Budi Santoso", "22\u201323 Sep 2026"));
       content.appendChild(wrapTxt("Demam, istirahat di rumah.", 14, "Regular", C.ink700));
       content.appendChild(kvRow("Diajukan", "21 Sep \xB7 18:02"));
+      content.appendChild(inputField("Alasan penolakan (wajib jika tolak)", "Contoh: overlapping absensi"));
       const actions = row("Actions", 12);
       stretch(actions);
       const a = cta("Setujui", C.success);
@@ -1238,6 +1242,7 @@
       content.appendChild(sectionTitle("Lembur \u2014 Citra Lestari", "19 Sep \xB7 2.0 jam"));
       content.appendChild(kvRow("Jam", "16:30 \u2013 18:30"));
       content.appendChild(kvRow("Keterangan", "Penyelesaian loading"));
+      content.appendChild(inputField("Alasan penolakan (wajib jika tolak)", "Contoh: melebihi kebijakan"));
       content.appendChild(cta("Setujui", C.success));
       content.appendChild(ghostCta("Tolak"));
     });
@@ -1282,14 +1287,14 @@
       last2(content).appendChild(txt("104892 \xB7 Budi \xB7 22/09 \xB7 07:28 \xB7 \u2014 \xB7 Hadir \xB7 0", 12, "Regular", C.ink700));
       const actions = row("Export", 12);
       stretch(actions);
-      const pdf = cta("Unduh PDF", C.primary);
-      pdf.layoutAlign = "INHERIT";
-      pdf.primaryAxisSizingMode = "AUTO";
-      const xls = secondaryCta("Unduh Excel");
+      const xls = cta("Unduh Excel", C.primary);
       xls.layoutAlign = "INHERIT";
       xls.primaryAxisSizingMode = "AUTO";
-      actions.appendChild(pdf);
+      const pdf = secondaryCta("Unduh PDF (opsional)");
+      pdf.layoutAlign = "INHERIT";
+      pdf.primaryAxisSizingMode = "AUTO";
       actions.appendChild(xls);
+      actions.appendChild(pdf);
       content.appendChild(actions);
     });
     put("W-H01", "Manajemen pengguna", "Karyawan", "app", ({ content }) => {
@@ -1299,22 +1304,25 @@
       content.appendChild(listRow("Siti HRD", "HRD \xB7 Aktif", "\u203A"));
     });
     put("W-H02", "Form pengguna", "Karyawan", "app", ({ content }) => {
-      content.appendChild(inputField("Nama", "Nama lengkap"));
-      content.appendChild(inputField("Email / NIP", ""));
+      content.appendChild(inputField("Nama lengkap", "Budi Santoso"));
+      content.appendChild(inputField("Email", "budi@perusahaan.com"));
+      content.appendChild(inputField("Password awal", "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"));
       content.appendChild(inputField("Role", "Karyawan / Supervisor / HRD", "Karyawan"));
-      content.appendChild(inputField("Status", "Aktif", "Aktif"));
+      content.appendChild(inputField("Status", "Aktif / Nonaktif", "Aktif"));
+      content.appendChild(inputField("Supervisor (opsional)", "Andi Pratama"));
       content.appendChild(cta("Simpan", C.primary));
     });
     put("W-H03", "Lokasi & geofence", "Lokasi", "app", ({ content }) => {
       content.appendChild(cta("Tambah lokasi", C.primary));
-      content.appendChild(listRow("Site A \u2014 Gudang", "Radius 150 m", "\u203A"));
-      content.appendChild(listRow("Site B \u2014 Pool", "Radius 200 m", "\u203A"));
+      content.appendChild(listRow("Site A \u2014 Gudang", "Radius 100 m \xB7 Aktif", "\u203A"));
+      content.appendChild(listRow("Site B \u2014 Pool", "Radius 100 m \xB7 Aktif", "\u203A"));
+      content.appendChild(wrapTxt("Clock-in valid di salah satu lokasi aktif.", 12, "Regular", C.ink500));
     });
     put("W-H04", "Form lokasi", "Lokasi", "app", ({ content }) => {
       content.appendChild(inputField("Nama", "Site A \u2014 Gudang"));
       content.appendChild(inputField("Latitude", "-6.200"));
       content.appendChild(inputField("Longitude", "106.816"));
-      content.appendChild(inputField("Radius (m)", "150"));
+      content.appendChild(inputField("Radius (m)", "100"));
       content.appendChild(cta("Simpan lokasi", C.primary));
     });
     put("W-H05", "Log audit", "Pengaturan", "app", ({ content }) => {
@@ -1326,6 +1334,7 @@
       content.appendChild(inputField("Nama organisasi", "Divisi Operation"));
       content.appendChild(inputField("Timezone", "Asia/Jakarta"));
       content.appendChild(inputField("Default shift start", "07:30"));
+      content.appendChild(inputField("Grace terlambat (menit)", "15"));
       content.appendChild(cta("Simpan", C.primary));
     });
     put("W-S02", "Notifikasi sistem", "Pengaturan", "app", ({ content }) => {
