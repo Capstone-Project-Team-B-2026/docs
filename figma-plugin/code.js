@@ -859,7 +859,11 @@
   function last(node) {
     return node.children[node.children.length - 1];
   }
-  function generateMobileAuthHome(page, positions) {
+  async function generateMobileAuthHome(page, positions) {
+    const [hashMark, hashLight] = await Promise.all([
+      createImageHashFromUrl(LOGO_URLS.mark),
+      createImageHashFromUrl(LOGO_URLS.mobileLight)
+    ]);
     const put = (id, title, opts, fn) => {
       const wrap = buildMobile(page, 0, 0, id, title, opts, fn);
       positions.placeMobile(wrap);
@@ -869,12 +873,21 @@
       phone.fills = paint(C.primary);
       body.primaryAxisAlignItems = "CENTER";
       body.counterAxisAlignItems = "CENTER";
-      body.appendChild(txt("Nexus Ops", 32, "Bold", C.white));
-      body.appendChild(txt("Hadir. Valid. Terkontrol.", 14, "Regular", C.white));
-      body.appendChild(space(24));
+      const icon = imageOrRect("SplashLogo", 112, 112, hashLight || hashMark, C.primarySoft);
+      icon.cornerRadius = 28;
+      body.appendChild(icon);
+      body.appendChild(space(20));
+      body.appendChild(txt("Nexus Ops", 28, "Bold", C.white));
+      body.appendChild(txt("Hadir. Valid. Terkontrol.", 14, "Regular", C.primarySoft));
+      body.appendChild(space(28));
       body.appendChild(txt("Memeriksa sesi\u2026", 13, "Medium", C.primarySoft));
     });
     put("M-A02", "Masuk", { hideNav: true }, ({ body }) => {
+      body.counterAxisAlignItems = "CENTER";
+      const mark = imageOrRect("LoginMark", 64, 64, hashLight || hashMark, C.primarySoft);
+      mark.cornerRadius = 16;
+      body.appendChild(mark);
+      body.appendChild(space(12));
       body.appendChild(sectionTitle("Masuk ke Nexus Ops", "Karyawan Divisi Operation"));
       body.appendChild(inputField("Email / NIP", "nip@perusahaan.com"));
       body.appendChild(inputField("Kata sandi", "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"));
@@ -1489,7 +1502,7 @@
       webWraps.push(wrap);
     };
     if (scope === "all" || scope === "mobile" || scope === "components") {
-      generateMobileAuthHome(page, positions);
+      await generateMobileAuthHome(page, positions);
       generateMobileAttendance(page, positions);
       generateMobileLeaveOtProfile(page, positions);
       positions.finishMobile();

@@ -4,12 +4,18 @@ import {
   pill, listRow, softCard, inputField, kvRow, banner, sectionTitle,
   metricRow, space,
 } from './_shared.js';
+import { LOGO_URLS, createImageHashFromUrl, imageOrRect } from '../../brand/logos.js';
 
 function last(node) {
   return node.children[node.children.length - 1];
 }
 
-export function generateMobileAuthHome(page, positions) {
+export async function generateMobileAuthHome(page, positions) {
+  const [hashMark, hashLight] = await Promise.all([
+    createImageHashFromUrl(LOGO_URLS.mark),
+    createImageHashFromUrl(LOGO_URLS.mobileLight),
+  ]);
+
   const put = (id, title, opts, fn) => {
     const wrap = buildMobile(page, 0, 0, id, title, opts, fn);
     positions.placeMobile(wrap);
@@ -20,13 +26,23 @@ export function generateMobileAuthHome(page, positions) {
     phone.fills = paint(C.primary);
     body.primaryAxisAlignItems = 'CENTER';
     body.counterAxisAlignItems = 'CENTER';
-    body.appendChild(txt('Nexus Ops', 32, 'Bold', C.white));
-    body.appendChild(txt('Hadir. Valid. Terkontrol.', 14, 'Regular', C.white));
-    body.appendChild(space(24));
+    // App icon on splash (light tile) — falls back to soft fill if fetch fails
+    const icon = imageOrRect('SplashLogo', 112, 112, hashLight || hashMark, C.primarySoft);
+    icon.cornerRadius = 28;
+    body.appendChild(icon);
+    body.appendChild(space(20));
+    body.appendChild(txt('Nexus Ops', 28, 'Bold', C.white));
+    body.appendChild(txt('Hadir. Valid. Terkontrol.', 14, 'Regular', C.primarySoft));
+    body.appendChild(space(28));
     body.appendChild(txt('Memeriksa sesi…', 13, 'Medium', C.primarySoft));
   });
 
   put('M-A02', 'Masuk', { hideNav: true }, ({ body }) => {
+    body.counterAxisAlignItems = 'CENTER';
+    const mark = imageOrRect('LoginMark', 64, 64, hashLight || hashMark, C.primarySoft);
+    mark.cornerRadius = 16;
+    body.appendChild(mark);
+    body.appendChild(space(12));
     body.appendChild(sectionTitle('Masuk ke Nexus Ops', 'Karyawan Divisi Operation'));
     body.appendChild(inputField('Email / NIP', 'nip@perusahaan.com'));
     body.appendChild(inputField('Kata sandi', '••••••••'));

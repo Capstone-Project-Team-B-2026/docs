@@ -60,7 +60,7 @@ flowchart LR
 
 | ID | Layar | Catatan |
 |----|-------|---------|
-| M-A01 | Splash & cek sesi | Brand mark + loading token |
+| M-A01 | Splash & cek sesi | Brand mark (app icon) + loading token · Figma: icon light di atas tagline |
 | M-A02 | Masuk | Email/NIP + password (AUTH-01). **Tanpa** lupa password self-service |
 | M-A03 | Sesi berakhir | Re-auth |
 

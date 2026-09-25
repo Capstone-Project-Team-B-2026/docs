@@ -149,7 +149,7 @@ export async function generate(page, scope) {
   };
 
   if (scope === 'all' || scope === 'mobile' || scope === 'components') {
-    generateMobileAuthHome(page, positions);
+    await generateMobileAuthHome(page, positions);
     generateMobileAttendance(page, positions);
     generateMobileLeaveOtProfile(page, positions);
     positions.finishMobile();
