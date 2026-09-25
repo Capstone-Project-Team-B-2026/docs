@@ -12,13 +12,13 @@ Dokumentasi Capstone Project 50 Team B 2026 — **Aplikasi Absensi Divisi Operat
 
 | Anggota | GitHub | Peran |
 |---------|--------|-------|
-| Atin Mulyanto | [`atmcorporation`](https://github.com/atmcorporation) | Project Leader & Analyst + Manual Tester |
+| Atin Mulyanto | [`atmcorporation`](https://github.com/atmcorporation) | Project Leader & Analyst + Manual Tester + **Karil** |
 | Akmal Syarifudin | [`akmalsyrf`](https://github.com/akmalsyrf) | Backend & Infrastructure |
 | Leonardus Sunu Kristianto | [`leokrist`](https://github.com/leokrist) | Mobile (auth, absensi, profil) |
 | Asep Muhammad | [`asepmuhamad1300-ctrl`](https://github.com/asepmuhamad1300-ctrl) | UI/UX & Web dashboard |
 | Moch Riswan Lutfin Anfa | [`anfariswan`](https://github.com/anfariswan) | Mobile (leave/OT/notif) & web pendukung |
 
-Keputusan domain MVP terkunci di [PRD §10](./prd#10-keputusan-domain-terkunci-mvp). Board: [Project #2](https://github.com/orgs/Capstone-Project-Team-B-2026/projects/2).
+Keputusan domain MVP terkunci di [PRD §10](./prd#10-keputusan-domain-terkunci-mvp). Karya ilmiah (karil) paralel S2–S8: [SDLC §4.1](./sdlc#41-karya-ilmiah-karil--lanjutan-metopen). Board: [Project #2](https://github.com/orgs/Capstone-Project-Team-B-2026/projects/2).
 
 ## Dokumen utama
 

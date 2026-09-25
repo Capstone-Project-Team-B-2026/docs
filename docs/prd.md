@@ -12,10 +12,10 @@ title: Product Requirements Document (PRD)
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 1.0.0 |
+| Version | 1.0.1 |
 | Mata Kuliah | STSI4440 |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
-| Last updated | 2026-09-24 |
+| Last updated | 2026-09-25 |
 
 ---
 
@@ -444,7 +444,7 @@ MVP dianggap selesai bila:
 
 | Anggota | GitHub | Peran |
 |---------|--------|-------|
-| Atin Mulyanto | [`atmcorporation`](https://github.com/atmcorporation) | Project Leader & Analyst — requirement, koordinasi, **manual tester** (card `[Test]`) |
+| Atin Mulyanto | [`atmcorporation`](https://github.com/atmcorporation) | Project Leader & Analyst — requirement, koordinasi, **manual tester**, **penulis karya ilmiah (karil)** |
 | Akmal Syarifudin | [`akmalsyrf`](https://github.com/akmalsyrf) | Backend & Infrastructure — API, DB, face/geofence server-side, CI/CD |
 | Leonardus Sunu Kristianto | [`leokrist`](https://github.com/leokrist) | Mobile Developer — auth/home, absensi (kamera + GPS), profil/enrollment |
 | Asep Muhammad | [`asepmuhamad1300-ctrl`](https://github.com/asepmuhamad1300-ctrl) | UI/UX & Web Frontend — Figma/design system, dashboard admin Vue |
@@ -462,7 +462,9 @@ MVP dianggap selesai bila:
 - Web dashboard admin
 - Backend RESTful API
 - Dokumentasi teknis (arsitektur, API spec, panduan)
-- Checklist tes manual + laporan proyek + presentasi/demo
+- Checklist tes manual + UAT
+- **Karya ilmiah (karil)** — naskah Bab I–V (lanjutan bentuk metopen UT / R&D); owner Atin; board `[Docs] Karil`
+- Laporan akhir proyek + presentasi/demo
 
 ---
 
@@ -477,7 +479,7 @@ MVP dianggap selesai bila:
 | 0.2.0 | 2026-09-24 | Kunci keputusan domain MVP; tim lengkap (Atin + Anfa); Atin = PL/Analyst + manual tester; cut face override / lupa password / kuota |
 | 0.2.1 | 2026-09-24 | Hub clock-out state, batal leave, RBAC guard; kunci FCM + Cloudflare R2 |
 | 1.0.0 | 2026-09-24 | **Locked:** NFR angka, state machine, reason codes, enums, face on-device, D-09 embedding-only, ATT-06 definisi |
-
+| 1.0.1 | 2026-09-25 | Luaran karil (Bab I–V) + Atin sebagai penulis; selaras SDLC §4.1 |
 ---
 
 ## Referensi

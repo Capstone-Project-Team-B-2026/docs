@@ -12,9 +12,9 @@ title: Software Development Life Cycle (SDLC)
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 1.0.1 |
+| Version | 1.0.2 |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
-| Last updated | 2026-09-24 |
+| Last updated | 2026-09-25 |
 
 ---
 
@@ -110,9 +110,11 @@ Prinsip kerja:
 | Push `main` | Worker / Pages **development** |
 | Tag `v*` | Worker / Pages **production** · APK stg |
 
-### 3.6 Maintenance & evaluasi
+### 3.6 Maintenance, evaluasi & karya ilmiah
 
-Bugfix UAT Minggu 7–8; laporan + presentasi Minggu 8.
+Bugfix UAT Minggu 7–8; release + presentasi Minggu 8.
+
+**Karya ilmiah (karil)** dikerjakan **paralel** dengan build (owner **Atin**), melanjutkan struktur **metopen** UT (Bab I–V / R&D). Lihat [§4.1](#41-karya-ilmiah-karil--lanjutan-metopen).
 
 ---
 
@@ -121,13 +123,13 @@ Bugfix UAT Minggu 7–8; laporan + presentasi Minggu 8.
 | Sprint | Tanggal (dari) | Fase | Fokus | Artefak |
 |--------|----------------|------|-------|---------|
 | **S1** | 2026-09-22 | Analisis | Wawancara, requirement | PRD Locked |
-| **S2** | 2026-09-29 | Kickoff paralel | Auth/shell mobile + web; kontrak API | Login/home/dashboard skeleton |
-| **S3** | 2026-10-06 | Build paralel | Attendance (face/GPS) + Approvals + notif feed UI | Clock-in + inbox + M-N01 |
-| **S4** | 2026-10-13 | Build paralel | Leave + Reports + riwayat UI + tim web | Leave + ekspor + history UI |
-| **S5** | 2026-10-20 | Build paralel | OT + HRD users + notif API | Lembur + kelola akun + FCM |
-| **S6** | 2026-10-27 | Build + integrasi | Geofence master + face enroll + history API | P1 lokasi & enrollment |
-| **S7** | 2026-11-03 | Polish + UAT start | P2 sisa + mulai UAT | UAT checklist berjalan |
-| **S8** | 2026-11-10 | UAT & Release | Perbaikan UAT, deploy, laporan | Tag `v1.0.0` + laporan akhir |
+| **S2** | 2026-09-29 | Kickoff paralel | Auth/shell mobile + web; kontrak API; **Karil Bab I** | Login/home skeleton + outline naskah |
+| **S3** | 2026-10-06 | Build paralel | Attendance (face/GPS) + Approvals + notif feed UI; **Karil Bab II teori** | Clock-in + inbox + M-N01 |
+| **S4** | 2026-10-13 | Build paralel | Leave + Reports + riwayat UI + tim web; **Karil Bab II lit. review** | Leave + ekspor + history UI |
+| **S5** | 2026-10-20 | Build paralel | OT + HRD users + notif API; **Karil Bab III metode** | Lembur + kelola akun + FCM |
+| **S6** | 2026-10-27 | Build + integrasi | Geofence + face enroll + history API; **Karil instrumen Bab IV** | P1 lokasi & enrollment |
+| **S7** | 2026-11-03 | Polish + UAT start | P2 sisa + UAT; **Karil Bab IV draft** | UAT checklist berjalan |
+| **S8** | 2026-11-10 | UAT & Release | Deploy + **Karil Bab V + finalisasi naskah** + presentasi | Tag `v1.0.0` + karil PDF |
 
 **Urutan jenis kerja:** **[Contract]** / **[UI]** → Backlog di awal sprint → **[Impl]** / **[API]** (Icebox sampai kontrak/UI siap) → **[Test]** (Icebox sampai UI + wire API siap; lalu Backlog / eksekusi).
 
@@ -144,11 +146,28 @@ gantt
   Backend API                    :b1, 2026-09-29, 42d
   Mobile UI / MVP                :m1, 2026-09-29, 42d
   Web dashboard                  :w1, 2026-09-29, 42d
+  Karya ilmiah (Karil)           :k1, 2026-09-29, 49d
 
   section S7–S8 Validasi
   Integrasi & UAT                :t1, 2026-11-03, 14d
-  Release & laporan              :r1, 2026-11-10, 7d
+  Release & karil final          :r1, 2026-11-10, 7d
 ```
+
+### 4.1 Karya ilmiah (karil) — lanjutan metopen
+
+Naskah ilmiah capstone **melanjutkan bentuk metopen** UT (contoh struktur: Bab I Pendahuluan → Bab II Kajian pustaka → Bab III Metode R&D → Bab IV Hasil/pembahasan → Bab V Kesimpulan). Topik = **Nexus Ops** (bukan topik metopen individu lain); isi Bab I–III diadaptasi dari [PRD](./prd) + [Infrastructure](./infrastructure) + proposal kelompok.
+
+| Sprint | Card board (assignee Atin) | Bab / fokus |
+|--------|----------------------------|-------------|
+| **S2** | [docs#12](https://github.com/Capstone-Project-Team-B-2026/docs/issues/12) | Outline + **Bab I** Pendahuluan |
+| **S3** | [docs#13](https://github.com/Capstone-Project-Team-B-2026/docs/issues/13) | **Bab II** Landasan teori |
+| **S4** | [docs#14](https://github.com/Capstone-Project-Team-B-2026/docs/issues/14) | **Bab II** Penelitian terdahulu & kerangka |
+| **S5** | [docs#15](https://github.com/Capstone-Project-Team-B-2026/docs/issues/15) | **Bab III** Metode (R&D ↔ SDLC) |
+| **S6** | [docs#16](https://github.com/Capstone-Project-Team-B-2026/docs/issues/16) | **Bab III** Instrumen/metrik + kerangka Bab IV |
+| **S7** | [docs#17](https://github.com/Capstone-Project-Team-B-2026/docs/issues/17) | **Bab IV** Hasil & pembahasan (draft) |
+| **S8** | [docs#18](https://github.com/Capstone-Project-Team-B-2026/docs/issues/18) + [docs#10](https://github.com/Capstone-Project-Team-B-2026/docs/issues/10) | **Bab V** + finalisasi naskah + presentasi |
+
+**Accountable:** Atin. Tim menyuplai data UAT, screenshot, dan review teknis. Prefix board: `[Docs] Karil — …` · label `karil`.
 
 ---
 
@@ -218,7 +237,7 @@ flowchart TB
 
 | Anggota | GitHub | Peran | Tanggung jawab SDLC |
 |---------|--------|-------|---------------------|
-| Atin Mulyanto | `atmcorporation` | Project Leader & Analyst + **Manual Tester** | Backlog, `[Test]`, UAT sign-off, Maestro gate |
+| Atin Mulyanto | `atmcorporation` | Project Leader & Analyst + **Manual Tester** + **penulis karya ilmiah** | Backlog, `[Test]`, UAT sign-off, Maestro gate, **naskah karil Bab I–V** |
 | Akmal Syarifudin | `akmalsyrf` | Backend & Infrastructure | API, DB, face server-side, FCM/R2, CI/CD |
 | Leonardus Sunu Kristianto | `leokrist` | Mobile Developer | Auth/home, absensi (kamera + GPS + face), profil/enrollment |
 | Asep Muhammad | `asepmuhamad1300-ctrl` | UI/UX & Web Frontend | Figma, design system, web dashboard |
@@ -237,6 +256,7 @@ flowchart TB
 | Mobile (leave/OT/notif) | Anfa | Akmal (kontrak) |
 | Web | Asep (+ Anfa area assign) | Akmal (kontrak) |
 | Tes manual / UAT | Atin | Seluruh tim (fix) |
+| **Karya ilmiah (karil)** | Atin | Tim (data UAT, screenshot, review teknis) |
 | Release | Akmal (tag/deploy) | Atin (sign-off) |
 
 ---
@@ -265,7 +285,7 @@ Risiko produk: [PRD §12](./prd).
 | Build | Kode, OpenAPI versioned, coverage CI |
 | Testing | Integration BE · Playwright CI · Maestro manual · checklist Atin |
 | UAT | Hasil skenario pass/fail |
-| Release | Tag `v*`, catatan rilis, laporan akhir |
+| Release | Tag `v*`, catatan rilis, **naskah karil Bab I–V (PDF)**, presentasi |
 
 ---
 
@@ -277,7 +297,7 @@ Risiko produk: [PRD §12](./prd).
 | 0.1.1–0.1.6 | 2026-09-24 | Sprint 1 minggu, paralel, FCM/R2, automation, rebalance |
 | 1.0.0 | 2026-09-24 | **Locked:** DoR testID/contract, coverage scope, Playwright CI + Maestro manual, OpenAPI via Deploy publish, Estimate field |
 | 1.0.1 | 2026-09-25 | Otomasi Backlog: hanya `[Contract]`/`[UI]`; `[Test]` Icebox sampai UI+API siap (DoR §5.2) |
-
+| 1.0.2 | 2026-09-25 | **Karil** paralel S2–S8 (Atin); mapping Bab I–V lanjutan metopen; card docs#12–#18 |
 ---
 
 ## Referensi
