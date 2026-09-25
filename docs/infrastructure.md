@@ -240,38 +240,43 @@ Provider: **Neon**. Schema dikelola Drizzle (`drizzle/` migrations).
 - Default shift start **`08:00` WIB**; grace **15 menit** → terlambat jika clock-in setelah **08:15 WIB**
 - Org timezone: **`Asia/Jakarta`** (`W-S01`)
 
-**Sudah ada:**
+**Sudah ada (migrasi `0000`):**
 
 | Tabel | Catatan |
 |-------|---------|
 | `users` | `id` UUID, `email`, `password_hash`, `full_name`, `role` (`employee`\|`supervisor`\|`hrd`), `is_active`, audit columns |
 
-**ERD terkunci v1** (target migrasi S2–S6):
+**ERD v1.1** (migrasi `0001` + seeds — skalabilitas: index, outbox claim, mean embedding, site/shift):
 
 | Tabel | Kolom kunci |
 |-------|-------------|
-| `employees` | `id`, `user_id` FK unique, `nip` unique, `supervisor_id` FK nullable, `default_location_id` FK nullable, `shift_start` time default `08:00` |
-| `locations` | `id`, `name`, `lat`, `lng`, `radius_m` default 100, `is_active` |
-| `attendance_records` | `id`, `employee_id`, `work_date`, `clock_in_at`, `clock_out_at`, lat/lng in/out, `face_result`, `gps_result`, `status` (`present`\|`late`\|`absent`\|`leave`\|`holiday`), **`UNIQUE (employee_id, work_date)`** |
-| `employee_face_templates` | `employee_id` PK/FK, `embeddings` jsonb (sampel + mean), `enrolled_at` |
-| `leave_requests` | `employee_id`, `type` (`sick`\|`annual`\|`other`), `status` (`pending`\|`approved`\|`rejected`\|`cancelled`), dates, `reject_reason` |
-| `overtime_requests` | `employee_id`, hours (max 4), `status`, `reject_reason` |
-| `device_tokens` | `user_id`, `token`, `platform`, `updated_at` |
-| `notifications` | outbox: `user_id`, `title`, `body`, `status` (`pending`\|`sent`\|`failed`), `fcm_message_id` |
-| `audit_logs` | `actor_id`, `action`, `entity`, `entity_id`, `payload` jsonb, `created_at` |
+| `org_settings` | timezone, `default_shift_start`, `grace_minutes`, geofence/GPS defaults (single-tenant row) |
+| `locations` | `id`, `name`, `lat`, `lng`, `radius_m` default 100, `is_active` · partial index aktif |
+| `shifts` | `id`, `name`, `start_time`/`end_time`, `is_default` — filter dashboard `shiftId` |
+| `employees` | `user_id` UK, `nip` UK, `supervisor_id`, `default_location_id`, `shift_id`, `shift_start` nullable |
+| `attendance_records` | **`UNIQUE (employee_id, work_date)`**, lat/lng in/out, **`matched_location_id`**, `face_result`, `gps_result`, `status` · idx `(work_date, status)`, `(matched_location_id, work_date)` |
+| `employee_face_templates` | `employee_id` PK, `embeddings` jsonb (sampel), **`mean_embedding real[]`** (hot-path cosine) |
+| `leave_requests` | dates, `reject_reason`, `reviewed_by`/`reviewed_at` · CHECK end≥start · **EXCLUDE gist** no-overlap pending\|approved · partial idx pending |
+| `overtime_requests` | `work_date`, `start_at`/`end_at`, `hours` **CHECK ≤ 4**, status, reviewer · partial idx pending |
+| `device_tokens` | `user_id`, **`UNIQUE (token)`**, `platform`, `last_seen_at`, `deactivated_at` |
+| `notifications` | outbox + **`claimed_at` / `attempts` / `next_attempt_at`** · partial idx pending |
+| `audit_logs` | `actor_id`, `action`, `entity`, `entity_id`, `payload` · idx `created_at`, `(entity, entity_id)` |
+| `holidays` | `holiday_date` UK, `name` — sumber status `holiday` |
 
 **Login identifier:** mengandung `@` → cocokkan `users.email`; selain itu → cocokkan `employees.nip`.
 
 ```mermaid
 erDiagram
   USERS ||--o| EMPLOYEES : "has profile"
+  SHIFTS ||--o{ EMPLOYEES : "default shift"
   EMPLOYEES ||--o{ ATTENDANCE_RECORDS : "clocks"
   EMPLOYEES ||--o| EMPLOYEE_FACE_TEMPLATES : "enrolls"
   EMPLOYEES ||--o{ LEAVE_REQUESTS : "submits"
   EMPLOYEES ||--o{ OVERTIME_REQUESTS : "submits"
   EMPLOYEES }o--o| EMPLOYEES : "reports_to"
-  LOCATIONS ||--o{ ATTENDANCE_RECORDS : "validates"
+  LOCATIONS ||--o{ ATTENDANCE_RECORDS : "matched site"
   LOCATIONS ||--o{ EMPLOYEES : "default_site"
+  HOLIDAYS ||--o{ ATTENDANCE_RECORDS : "marks holiday"
   USERS ||--o{ DEVICE_TOKENS : "registers"
   USERS ||--o{ NOTIFICATIONS : "receives"
   USERS ||--o{ AUDIT_LOGS : "acts"
@@ -284,17 +289,30 @@ erDiagram
     string role
     boolean is_active
   }
+  ORG_SETTINGS {
+    uuid id PK
+    string timezone
+    time default_shift_start
+    int grace_minutes
+  }
+  SHIFTS {
+    uuid id PK
+    string name
+    time start_time
+    boolean is_default
+  }
   EMPLOYEES {
     uuid id PK
     uuid user_id FK
     string nip UK
     uuid supervisor_id FK
     uuid default_location_id FK
-    time shift_start
+    uuid shift_id FK
   }
   EMPLOYEE_FACE_TEMPLATES {
     uuid employee_id PK
     jsonb embeddings
+    real_array mean_embedding
     timestamptz enrolled_at
   }
   LOCATIONS {
@@ -309,6 +327,7 @@ erDiagram
     uuid id PK
     uuid employee_id FK
     date work_date
+    uuid matched_location_id FK
     timestamptz clock_in_at
     timestamptz clock_out_at
     string status
@@ -320,27 +339,37 @@ erDiagram
     uuid employee_id FK
     string type
     string status
+    date start_date
+    date end_date
   }
   OVERTIME_REQUESTS {
     uuid id PK
     uuid employee_id FK
     string status
     float hours
+    date work_date
   }
   DEVICE_TOKENS {
     uuid id PK
     uuid user_id FK
-    string token
+    string token UK
   }
   NOTIFICATIONS {
     uuid id PK
     uuid user_id FK
     string status
+    int attempts
+    timestamptz claimed_at
   }
   AUDIT_LOGS {
     uuid id PK
     uuid actor_id FK
     string action
+  }
+  HOLIDAYS {
+    uuid id PK
+    date holiday_date UK
+    string name
   }
 ```
 
@@ -523,6 +552,7 @@ Selaras [SDLC §4](./sdlc).
 | 0.3.0 | 2026-09-24 | Klien terkunci: Vue Pages + RN Expo |
 | 0.3.1 | 2026-09-24 | ADR D-06 R2 + D-12 FCM |
 | 1.0.0 | 2026-09-24 | **Locked:** D-05 face on-device, D-09 embedding-only, ERD v1, timezone, batch/outbox, CORS, OpenAPI publish dari Deploy, R2=reports |
+| 1.0.1 | 2026-09-25 | **ERD v1.1:** org_settings, shifts, holidays; attendance `matched_location_id`; face `mean_embedding`; outbox claim fields; indexes + leave EXCLUDE overlap; OT CHECK ≤ 4 |
 
 ---
 
