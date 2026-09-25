@@ -12,7 +12,7 @@ title: Software Development Life Cycle (SDLC)
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 1.0.2 |
+| Version | 1.0.3 |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
 | Last updated | 2026-09-25 |
 
@@ -122,7 +122,7 @@ Bugfix UAT Minggu 7–8; release + presentasi Minggu 8.
 
 | Sprint | Tanggal (dari) | Fase | Fokus | Artefak |
 |--------|----------------|------|-------|---------|
-| **S1** | 2026-09-22 | Analisis | Wawancara, requirement | PRD Locked |
+| **S1** | 2026-09-22 | Analisis | Wawancara, requirement | PRD Locked + **retro foundation cards (Done)** |
 | **S2** | 2026-09-29 | Kickoff paralel | Auth/shell mobile + web; kontrak API; **Karil Bab I** | Login/home skeleton + outline naskah |
 | **S3** | 2026-10-06 | Build paralel | Attendance (face/GPS) + Approvals + notif feed UI; **Karil Bab II teori** | Clock-in + inbox + M-N01 |
 | **S4** | 2026-10-13 | Build paralel | Leave + Reports + riwayat UI + tim web; **Karil Bab II lit. review** | Leave + ekspor + history UI |
@@ -298,6 +298,7 @@ Risiko produk: [PRD §12](./prd).
 | 1.0.0 | 2026-09-24 | **Locked:** DoR testID/contract, coverage scope, Playwright CI + Maestro manual, OpenAPI via Deploy publish, Estimate field |
 | 1.0.1 | 2026-09-25 | Otomasi Backlog: hanya `[Contract]`/`[UI]`; `[Test]` Icebox sampai UI+API siap (DoR §5.2) |
 | 1.0.2 | 2026-09-25 | **Karil** paralel S2–S8 (Atin); mapping Bab I–V lanjutan metopen; card docs#12–#18 |
+| 1.0.3 | 2026-09-25 | S1 artefak: retro foundation cards (Done) di board — pekerjaan fondasi docs/backend/web/mobile |
 ---
 
 ## Referensi
