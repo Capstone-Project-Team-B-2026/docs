@@ -4,5 +4,12 @@
   "api": "1.0.0",
   "main": "code.js",
   "editorType": ["figma"],
-  "ui": "ui.html"
+  "ui": "ui.html",
+  "networkAccess": {
+    "allowedDomains": [
+      "https://raw.githubusercontent.com",
+      "https://capstone-project-team-b-2026.github.io"
+    ],
+    "reasoning": "Load Nexus Ops brand PNG logos from the public docs mirror into the Design Tokens board."
+  }
 }

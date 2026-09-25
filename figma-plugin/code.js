@@ -514,11 +514,44 @@
   ];
   var ALL_SCREEN_IDS = [...MOBILE_SCREENS, ...WEB_SCREENS].map((r) => r[0]);
 
+  // src/brand/logos.js
+  var LOGO_URLS = {
+    web: "https://raw.githubusercontent.com/Capstone-Project-Team-B-2026/docs/main/static/img/brand/logo-web.png",
+    webTransparent: "https://raw.githubusercontent.com/Capstone-Project-Team-B-2026/docs/main/static/img/brand/logo-web-transparent.png",
+    mobileLight: "https://raw.githubusercontent.com/Capstone-Project-Team-B-2026/docs/main/static/img/brand/logo-mobile-light.png",
+    mobileDark: "https://raw.githubusercontent.com/Capstone-Project-Team-B-2026/docs/main/static/img/brand/logo-mobile-dark.png",
+    mark: "https://raw.githubusercontent.com/Capstone-Project-Team-B-2026/docs/main/static/img/brand/logo-mark.png"
+  };
+  async function createImageHashFromUrl(url) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const buf = new Uint8Array(await res.arrayBuffer());
+      const image = figma.createImage(buf);
+      return image.hash;
+    } catch (e) {
+      console.warn("logo fetch failed", url, e);
+      return null;
+    }
+  }
+  function imageOrRect(name, w, h, hash, fallbackFill) {
+    const node = figma.createRectangle();
+    node.name = name;
+    node.resize(w, h);
+    node.cornerRadius = Math.min(16, w * 0.12);
+    if (hash) {
+      node.fills = [{ type: "IMAGE", scaleMode: "FIT", imageHash: hash }];
+    } else {
+      node.fills = [{ type: "SOLID", color: fallbackFill }];
+    }
+    return node;
+  }
+
   // src/screens/tokens-board.js
   async function generateTokens(page, x, y) {
     const board = figma.createFrame();
-    board.name = "DS \xB7 Design Tokens v0.1";
-    board.resize(1440, 900);
+    board.name = "DS \xB7 Design Tokens v1.0";
+    board.resize(1440, 1100);
     board.x = x;
     board.y = y;
     board.fills = paint(C.background);
@@ -534,9 +567,27 @@
     page.appendChild(board);
     const hero = col("Hero", 8);
     hero.appendChild(txt("Nexus Ops Design Tokens", 32, "Bold", C.ink900));
-    hero.appendChild(txt("v0.1 \xB7 Slate-navy \xB7 Cyan GPS \xB7 design-system.md", 14, "Regular", C.ink500));
+    hero.appendChild(txt("v1.0 \xB7 Locked \xB7 Slate-navy \xB7 Cyan GPS \xB7 design-system.md", 14, "Regular", C.ink500));
     hero.appendChild(txt("Hadir. Valid. Terkontrol.", 14, "SemiBold", C.primaryDark));
     board.appendChild(hero);
+    const [hashWeb, hashLight, hashDark] = await Promise.all([
+      createImageHashFromUrl(LOGO_URLS.web),
+      createImageHashFromUrl(LOGO_URLS.mobileLight),
+      createImageHashFromUrl(LOGO_URLS.mobileDark)
+    ]);
+    const brandRow = row("BrandLogos", 16);
+    brandRow.appendChild(imageOrRect("Logo Web", 420, 110, hashWeb, C.ink950));
+    brandRow.appendChild(imageOrRect("App Icon Light", 120, 120, hashLight, C.surface));
+    brandRow.appendChild(imageOrRect("App Icon Dark", 120, 120, hashDark, C.primaryDark));
+    board.appendChild(brandRow);
+    board.appendChild(
+      wrapTxt(
+        "Assets: figma-plugin/assets/ \xB7 static/img/brand/ \xB7 Links: docs Links & Environments",
+        12,
+        "Regular",
+        C.ink500
+      )
+    );
     const row1 = row("Swatches1", 12);
     TOKEN_SWATCHES.slice(0, 4).forEach(([name, color, hexv, use]) => {
       row1.appendChild(swatch(name, color, hexv, use));
@@ -1063,6 +1114,7 @@
     brand.counterAxisAlignItems = "CENTER";
     brand.appendChild(txt("Nexus Ops", 28, "Bold", C.primaryDark));
     brand.appendChild(txt("Absensi Divisi Operation", 12, "Regular", C.ink500));
+    brand.appendChild(txt("Logo: figma-plugin/assets/logo-web.png", 11, "Regular", C.ink400));
     board.appendChild(brand);
     const panel = figma.createFrame();
     panel.name = "AuthPanel";

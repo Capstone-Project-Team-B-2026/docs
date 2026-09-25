@@ -32,7 +32,23 @@ Tagline visual: **Hadir. Valid. Terkontrol.**
 
 ## 2. Brand & warna
 
-Palette **slate-navy + cyan live** — profesional untuk operasi lapangan, bukan SaaS ungu generik.
+### 2.0 Logo assets
+
+| Varian | Penggunaan | File |
+|--------|------------|------|
+| **Logo web** | Wordmark desktop (dark BG) | `static/img/brand/logo-web.png` · Figma `figma-plugin/assets/logo-web.png` |
+| **Logo web transparent** | Navbar / overlay | `logo-web-transparent.png` |
+| **App icon light** | Mobile icon · light | `logo-mobile-light.png` |
+| **App icon dark** | Mobile icon · dark | `logo-mobile-dark.png` |
+| **Mark** | Adaptive icon foreground / favicon mark | `logo-mark.png` |
+
+![Logo web](/img/brand/logo-web.png)
+
+| Light | Dark |
+|-------|------|
+| ![light](/img/brand/logo-mobile-light.png) | ![dark](/img/brand/logo-mobile-dark.png) |
+
+Di Figma: jalankan plugin **Generate Everything** — board tokens memuat logo dari URL mirror docs (lihat `figma-plugin/src/brand/logos.js`). Import manual dari `figma-plugin/assets/` juga boleh.
 
 ### 2.1 Brand
 
@@ -291,3 +307,4 @@ Generate: dari root docs, `node figma-plugin/scripts/export-tokens.mjs` (atau `n
 | 0.1.2 | 2026-09-24 | Pola clock-out + reject reason wajib |
 | 0.1.3 | 2026-09-24 | State pragmatis tanpa frame ekstra |
 | 1.0.0 | 2026-09-24 | **Locked:** testID registry, props minimum, token vendoring, status API labels |
+| 1.0.1 | 2026-09-25 | Brand logo assets (web / mobile light / dark) + Links hub |

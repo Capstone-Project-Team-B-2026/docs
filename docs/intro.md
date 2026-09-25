@@ -6,7 +6,30 @@ title: Introduction
 
 # Nexus Ops
 
+![Nexus Ops](/img/brand/logo-web.png)
+
 Dokumentasi Capstone Project 50 Team B 2026 — **Aplikasi Absensi Divisi Operation**.
+
+## Pintasan
+
+| | |
+|--|--|
+| Docs site | [capstone-project-team-b-2026.github.io/docs](https://capstone-project-team-b-2026.github.io/docs/) |
+| Project board | [GitHub Projects #2 · view 4](https://github.com/orgs/Capstone-Project-Team-B-2026/projects/2/views/4) |
+| Figma | [NexusOps design file](https://www.figma.com/design/JOx148Ldmrd6DnmVwoRkti/NexusOps?node-id=0-1) |
+| API dev | [dev-nexus-ops-api…workers.dev](https://dev-nexus-ops-api.dev-akmal69.workers.dev) |
+| API prod | [nexus-ops-api…workers.dev](https://nexus-ops-api.dev-akmal69.workers.dev) |
+| Web dev | [dev-nexus-ops-web.pages.dev](https://dev-nexus-ops-web.pages.dev) |
+| Web prod | [nexus-ops-web.pages.dev](https://nexus-ops-web.pages.dev) |
+| APK dev | [mobile Actions · Build APK](https://github.com/Capstone-Project-Team-B-2026/mobile/actions) |
+
+Daftar lengkap env & brand: **[Links & Environments](./links)**.
+
+## Brand
+
+| Web | Mobile light | Mobile dark |
+|-----|--------------|-------------|
+| ![web](/img/brand/logo-web.png) | ![light](/img/brand/logo-mobile-light.png) | ![dark](/img/brand/logo-mobile-dark.png) |
 
 ## Tim
 
@@ -29,6 +52,7 @@ Keputusan domain MVP terkunci di [PRD §10](./prd#10-keputusan-domain-terkunci-m
 | [Infrastructure Document](./infrastructure) | **Locked v1.0** | Stack + face on-device + FCM + R2 + ERD v1 |
 | [Design System](./design-system) | **Locked v1.0** | Token, komponen, testID registry |
 | [Screens & Pages](./screens) | **Locked v1.0** | Inventaris layar mobile (M-*) & web (W-*) |
+| [Links & Environments](./links) | **Living** | URL docs, Figma, API, web, APK, brand assets |
 | [Development Tools Setup](./dev-setup) | **Living** | Instalasi tooling lokal (fokus Windows) |
 | [Git Workflow](./git-workflow) | **Living** | Branching trunk-based, commit, PR, review |
 
@@ -47,24 +71,15 @@ Detail: [Infrastructure Document](./infrastructure). Setup lokal: [Development T
 
 ## Desain di Figma
 
-Generator layar MVP ada di folder `figma-plugin/` (plugin development lokal). Build dengan `npm run build`, lalu load `manifest.json` di Figma → Plugins → Development.
+File: [NexusOps di Figma](https://www.figma.com/design/JOx148Ldmrd6DnmVwoRkti/NexusOps?node-id=0-1).
+
+Generator layar MVP: folder `figma-plugin/` (plugin development lokal). Asset logo ada di `figma-plugin/assets/` dan `static/img/brand/`. Build dengan `npm run build`, lalu load `manifest.json` di Figma → Plugins → Development.
 
 ## Cara menambah halaman
 
 1. Buat file `.md` atau `.mdx` di folder `docs/`
 2. (Opsional) set `sidebar_position` di front matter
 3. Sidebar ter-generate otomatis dari struktur folder
-
-```md
----
-sidebar_position: 2
-title: Getting Started
----
-
-# Getting Started
-
-Isi halaman...
-```
 
 ## Repositories
 

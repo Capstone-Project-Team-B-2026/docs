@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Nexus Ops',
   tagline: 'Capstone Project 50 Team B 2026',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/brand/favicon.ico',
 
   future: {
     v4: true,
@@ -59,7 +59,7 @@ const config: Config = {
       title: 'Nexus Ops',
       logo: {
         alt: 'Nexus Ops',
-        src: 'img/logo.svg',
+        src: 'img/brand/logo-navbar.png',
       },
       items: [
         {
@@ -67,6 +67,21 @@ const config: Config = {
           sidebarId: 'docsSidebar',
           position: 'left',
           label: 'Docs',
+        },
+        {
+          to: '/links',
+          label: 'Links',
+          position: 'left',
+        },
+        {
+          href: 'https://github.com/orgs/Capstone-Project-Team-B-2026/projects/2/views/4',
+          label: 'Board',
+          position: 'right',
+        },
+        {
+          href: 'https://www.figma.com/design/JOx148Ldmrd6DnmVwoRkti/NexusOps?node-id=0-1',
+          label: 'Figma',
+          position: 'right',
         },
         {
           href: 'https://github.com/Capstone-Project-Team-B-2026/docs',

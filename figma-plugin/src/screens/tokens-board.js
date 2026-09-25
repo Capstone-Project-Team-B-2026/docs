@@ -3,11 +3,12 @@ import { txt, wrapTxt, row, col, stretch } from '../ui/layout.js';
 import { cta, secondaryCta, ghostCta, pill, progress, card } from '../ui/primitives.js';
 import { NORTH_STAR, PRODUCT_METRICS, SCREEN_METRIC_HINTS } from '../catalog/metrics.js';
 import { MOBILE_SCREENS, WEB_SCREENS } from '../catalog/ids.js';
+import { LOGO_URLS, createImageHashFromUrl, imageOrRect } from '../brand/logos.js';
 
 export async function generateTokens(page, x, y) {
   const board = figma.createFrame();
-  board.name = 'DS · Design Tokens v0.1';
-  board.resize(1440, 900);
+  board.name = 'DS · Design Tokens v1.0';
+  board.resize(1440, 1100);
   board.x = x;
   board.y = y;
   board.fills = paint(C.background);
@@ -24,9 +25,29 @@ export async function generateTokens(page, x, y) {
 
   const hero = col('Hero', 8);
   hero.appendChild(txt('Nexus Ops Design Tokens', 32, 'Bold', C.ink900));
-  hero.appendChild(txt('v0.1 · Slate-navy · Cyan GPS · design-system.md', 14, 'Regular', C.ink500));
+  hero.appendChild(txt('v1.0 · Locked · Slate-navy · Cyan GPS · design-system.md', 14, 'Regular', C.ink500));
   hero.appendChild(txt('Hadir. Valid. Terkontrol.', 14, 'SemiBold', C.primaryDark));
   board.appendChild(hero);
+
+  // Brand logos (fetched from docs mirror when network allowed)
+  const [hashWeb, hashLight, hashDark] = await Promise.all([
+    createImageHashFromUrl(LOGO_URLS.web),
+    createImageHashFromUrl(LOGO_URLS.mobileLight),
+    createImageHashFromUrl(LOGO_URLS.mobileDark),
+  ]);
+  const brandRow = row('BrandLogos', 16);
+  brandRow.appendChild(imageOrRect('Logo Web', 420, 110, hashWeb, C.ink950));
+  brandRow.appendChild(imageOrRect('App Icon Light', 120, 120, hashLight, C.surface));
+  brandRow.appendChild(imageOrRect('App Icon Dark', 120, 120, hashDark, C.primaryDark));
+  board.appendChild(brandRow);
+  board.appendChild(
+    wrapTxt(
+      'Assets: figma-plugin/assets/ · static/img/brand/ · Links: docs Links & Environments',
+      12,
+      'Regular',
+      C.ink500,
+    ),
+  );
 
   const row1 = row('Swatches1', 12);
   TOKEN_SWATCHES.slice(0, 4).forEach(([name, color, hexv, use]) => {

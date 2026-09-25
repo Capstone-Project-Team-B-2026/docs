@@ -49,6 +49,7 @@ function webAuthShell(screenId, title, x, y) {
   brand.counterAxisAlignItems = 'CENTER';
   brand.appendChild(txt('Nexus Ops', 28, 'Bold', C.primaryDark));
   brand.appendChild(txt('Absensi Divisi Operation', 12, 'Regular', C.ink500));
+  brand.appendChild(txt('Logo: figma-plugin/assets/logo-web.png', 11, 'Regular', C.ink400));
   board.appendChild(brand);
 
   const panel = figma.createFrame();
