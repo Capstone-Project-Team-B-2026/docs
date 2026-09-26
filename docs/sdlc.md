@@ -12,9 +12,9 @@ title: Software Development Life Cycle (SDLC)
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 1.0.3 |
+| Version | 1.0.4 |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
-| Last updated | 2026-09-25 |
+| Last updated | 2026-09-26 |
 
 ---
 
@@ -102,6 +102,50 @@ Prinsip kerja:
 | E2E web | Playwright | Job CI: `playwright install --with-deps chromium`; **API di-mock** lewat `page.route` (suite default tanpa secret `E2E_*`; tag `@live` opsional) |
 | E2E mobile | Maestro | **Gate manual** vs APK debug (owner Atin + assignee card); **bukan** CI — emulator terlalu lambat/flaky |
 | Manual / UAT | Checklist `[Test]` | Owner Atin; target adoption ≥ 80% |
+
+Indeks di bawah = **skenario utama** untuk DoD / UAT. Detail langkah hidup di spek `e2e/` + body card `[Test]`; aturan domain di [PRD §10](./prd#10-keputusan-domain-terkunci-mvp); inventaris layar di [Screens](./screens). Jangan menduplikasi Given/When/Then di dokumen ini.
+
+#### Integrasi BE (`test:integration`)
+
+Assert HTTP via `app.request()` terhadap Postgres (seed + `drizzle-kit push`). Bukan alur UI.
+
+| Modul / path | Skenario (happy path) | Story | Gate |
+|--------------|----------------------|-------|------|
+| Auth | Login valid → JWT; kredensial salah / user nonaktif ditolak | AUTH-01 | CI job integration |
+| Users / RBAC | `GET /me`; route HRD ditolak untuk role karyawan | AUTH-02/03 | CI bila slice terkait |
+| Attendance | Clock-in/out tersimpan + validasi geofence server-side | ATT-01…05 | CI bila slice terkait |
+| Leave | Submit pengajuan → approve/reject (alasan wajib saat tolak) | LV-01/02 | CI bila slice terkait |
+| Overtime | Submit lembur → approve/reject | OT-01/02 | CI bila slice terkait |
+| Reports | Generate/rekap siap unduh (Excel) | RPT-02/03 | CI bila slice terkait |
+| Notifications | Outbox FCM / in-app status approval | NTF-02 | CI bila slice terkait |
+
+Edge case & reason codes (`FACE_*`, `OUT_OF_GEOFENCE`, dll.) cukup di unit + PRD — jangan wajib di setiap suite integration.
+
+#### E2E web (Playwright)
+
+Suite default: **API di-mock** (`page.route`). Smoke CI tanpa secret `E2E_*`.
+
+| Skenario | Screens | Role | Artefak | Gate |
+|----------|---------|------|---------|------|
+| Shell brand | — | — | `web/e2e/smoke/shell.spec.ts` | CI smoke |
+| Login → dashboard | W-A01 | Supervisor | `web/e2e/auth/login.spec.ts` | CI setelah UI merge |
+| Inbox + tolak leave (alasan wajib) | W-AP01→03 | Supervisor | `web/e2e/approvals/inbox.spec.ts` | CI setelah UI merge |
+| Hub laporan → unduh Excel | W-R01→03 | HRD | `web/e2e/reports/export.spec.ts` | CI setelah UI merge |
+
+#### E2E mobile (Maestro)
+
+| Skenario | Screens | Role | Artefak | Gate |
+|----------|---------|------|---------|------|
+| Shell brand | — | — | `mobile/e2e/smoke/shell.yaml` | Manual (tag `smoke`) |
+| Login | M-A02 → M-H01 | Karyawan | `mobile/e2e/auth/login.yaml` | Manual vs APK |
+| Clock-in happy path | M-H01 → M-ATT01…04 | Karyawan | `mobile/e2e/attendance/clock-in.yaml` | Manual vs APK |
+| Ajukan cuti | M-LV01→02→04 | Karyawan | `mobile/e2e/leave/submit.yaml` | Manual vs APK |
+
+Owner gate Maestro: **Atin** + assignee card `[Test]`. Bukan CI.
+
+#### Manual / UAT
+
+Card board `[Test]` (owner Atin) menutup gap yang tidak diotomasi (wajah native, GPS nyata, FCM device). Target adoption ≥ **80%** skenario utama di atas lulus sebelum release S8. Checklist boleh ditulis di body issue sebelum DoR §5.2 terpenuhi; eksekusi setelah UI + client API di `main` / development.
 
 ### 3.5 Deployment & release
 
@@ -299,6 +343,7 @@ Risiko produk: [PRD §12](./prd).
 | 1.0.1 | 2026-09-25 | Otomasi Backlog: hanya `[Contract]`/`[UI]`; `[Test]` Icebox sampai UI+API siap (DoR §5.2) |
 | 1.0.2 | 2026-09-25 | **Karil** paralel S2–S8 (Atin); mapping Bab I–V lanjutan metopen; card docs#12–#18 |
 | 1.0.3 | 2026-09-25 | S1 artefak: retro foundation cards (Done) di board — pekerjaan fondasi docs/backend/web/mobile |
+| 1.0.4 | 2026-09-26 | §3.4: indeks skenario utama integration BE + E2E web/mobile + rujukan UAT `[Test]` |
 ---
 
 ## Referensi

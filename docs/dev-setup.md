@@ -12,9 +12,9 @@ title: Development Tools Setup
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 0.3.0 |
+| Version | 0.3.1 |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
-| Last updated | 2026-09-24 |
+| Last updated | 2026-09-26 |
 
 ---
 
@@ -34,7 +34,7 @@ Dokumen terkait: [Infrastructure](./infrastructure) (stack & deploy) · [SDLC](.
 | **VS Code** | Editor utama | Latest stable |
 | **Bun** | **Backend** + **Docs** (`packageManager: bun`) | 1.1.x+ (lihat `packageManager` di repo) |
 | **Node.js + npm** | **Web** + **Mobile** (`packageManager: npm`) | **Node 22+ / 24** (CI memakai Node 24) |
-| **GitHub CLI** (`gh`) | Web & mobile (`npm run api:sync` ke OpenAPI private) | Latest |
+| **GitHub CLI** (`gh`) | Opsional — clone private / `OPENAPI_SOURCE=backend` | Latest |
 | **JDK 17** | Mobile — `expo prebuild` / Gradle APK | **17** (LTS) |
 | **Android Studio** | Mobile — emulator, SDK, debug APK | Latest stable |
 | **Dev client / APK** | Mobile face/camera (vision-camera + TFLite) | `expo prebuild` — **Expo Go tidak cukup** |
@@ -44,8 +44,8 @@ Dokumen terkait: [Infrastructure](./infrastructure) (stack & deploy) · [SDLC](.
 | Peran | Tool wajib | Package manager | Opsional |
 |-------|------------|-----------------|----------|
 | Backend | Git, Bun, VS Code | `bun` | Wrangler CLI, `gh` |
-| Web | Git, Node/npm, VS Code, `gh` | `npm` | Playwright Chromium |
-| Mobile | Git, Node/npm, JDK 17, Android Studio, VS Code, `gh` | `npm` | Device fisik, Maestro CLI |
+| Web | Git, Node/npm, VS Code | `npm` | Playwright Chromium, `gh` |
+| Mobile | Git, Node/npm, JDK 17, Android Studio, VS Code | `npm` | Device fisik, Maestro CLI, `gh` |
 | Docs / UI | Git, Bun, VS Code | `bun` | Figma Desktop |
 
 :::note Bun vs npm
@@ -62,7 +62,7 @@ git --version
 code --version          # VS Code CLI (opsional)
 bun --version           # Backend / Docs
 node --version && npm --version   # Web / Mobile (Node 22+)
-gh --version            # Web / Mobile api:sync
+gh --version            # opsional (clone private / OPENAPI_SOURCE=backend)
 java -version           # Mobile: harus JDK 17
 ```
 
@@ -77,10 +77,11 @@ git config --global pull.rebase false
 
 Autentikasi GitHub:
 
-- HTTPS + credential helper, atau SSH key
-- **Wajib untuk web/mobile:** `gh auth login` (baca repo private `backend` untuk sync OpenAPI)
+- HTTPS + credential helper, atau SSH key (wajib untuk `git push`)
+- **`gh` opsional:** hanya jika pakai `OPENAPI_SOURCE=backend` atau butuh `gh` untuk clone/API private
 
 ```bash
+# opsional
 gh auth login
 gh auth status
 ```
@@ -226,14 +227,15 @@ adb version
 
 Folder `android/` digenerate oleh `expo prebuild` dan **tidak di-commit**.
 
-### 4.8 GitHub CLI (wajib web & mobile)
+### 4.8 GitHub CLI (opsional)
 
 ```powershell
 winget install --id GitHub.cli -e --source winget
 gh auth login
 ```
 
-`npm run api:sync` di web/mobile mengambil `openapi.json` dari **mirror publik** [`docs/static/openapi.json`](https://raw.githubusercontent.com/Capstone-Project-Team-B-2026/docs/main/static/openapi.json) (tanpa PAT). Opsional: `OPENAPI_SOURCE=backend npm run openapi:sync` lewat `gh api` ke repo private.
+`npm run api:sync` di web/mobile **default** mengunduh mirror publik [`docs/static/openapi.json`](https://raw.githubusercontent.com/Capstone-Project-Team-B-2026/docs/main/static/openapi.json) (**tanpa** PAT / `gh`).  
+Opsional: `OPENAPI_SOURCE=backend npm run openapi:sync` lewat `gh api` ke repo private (butuh `gh auth` + akses org).
 
 ### 4.9 Troubleshooting Windows
 
@@ -242,7 +244,7 @@ gh auth login
 | Perintah tidak dikenali setelah install | Tutup semua terminal / VS Code, buka ulang; cek PATH |
 | `bun` / `git` hanya jalan di Git Bash | Restart Windows Terminal |
 | Execution policy memblokir install Bun | `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` |
-| `api:sync` 404 / auth gagal | `gh auth login` + pastikan akses org `Capstone-Project-Team-B-2026` |
+| `api:sync` gagal (mirror 404 / kosong) | Pastikan backend sudah Deploy ke `main` (job publish OpenAPI); atau `OPENAPI_SOURCE=backend` + `gh auth login` |
 | Line ending conflict di PR | `core.autocrlf=true` di Windows |
 | Antivirus memblokir emulator | Exception folder Android SDK & `.gradle` |
 | JDK salah versi | `JAVA_HOME` → JDK **17** |
@@ -288,7 +290,7 @@ Org: [Capstone-Project-Team-B-2026](https://github.com/Capstone-Project-Team-B-2
 git clone https://github.com/Capstone-Project-Team-B-2026/backend.git
 cd backend
 bun install
-cp .env.example .env   # DATABASE_URL (Neon), JWT_SECRET
+cp .env.example .env   # DATABASE_URL, JWT_SECRET, FCM_* (wajib)
 bun run db:migrate && bun run db:seed
 bun run dev            # http://localhost:3000 · OpenAPI UI /docs
 ```
@@ -300,8 +302,9 @@ git clone https://github.com/Capstone-Project-Team-B-2026/web.git
 cd web
 npm install
 cp .env.example .env.development.local   # opsional
-gh auth login                            # sekali
-npm run api:generate                     # atau npm run api:sync
+npx playwright install chromium          # sekali, untuk E2E
+npm run api:sync                         # mirror docs + Orval (tanpa gh)
+npm run tokens:sync                      # opsional saat mulai kerja UI
 npm run dev
 ```
 
@@ -312,11 +315,11 @@ git clone https://github.com/Capstone-Project-Team-B-2026/mobile.git
 cd mobile
 npm install
 cp .env.example .env.development.local   # opsional EXPO_PUBLIC_*
-gh auth login
-npm run api:generate                     # atau npm run api:sync
+npm run api:sync                         # mirror docs + Orval (tanpa gh)
+npm run tokens:sync
 npm start                                # Metro; tekan `a` untuk Android
 # atau: npm run dev:android
-# APK debug lokal: npm run android:build:debug
+# APK debug lokal: npm run android:build:debug  (Expo Go tidak cukup untuk face)
 ```
 
 ### Docs — Bun
@@ -346,15 +349,14 @@ Alur branch / PR: [Git Workflow](./git-workflow).
 ### Web
 
 - [ ] Node 22+ / npm OK  
-- [ ] `gh auth status` OK  
-- [ ] `npm install` → `npm run api:generate` → `npm run dev`  
+- [ ] `npm install` → `npm run api:sync` → `npm run dev`  
 
 ### Mobile
 
 - [ ] Node 22+ / npm OK  
 - [ ] JDK 17 + `ANDROID_HOME` / `adb` (untuk native/APK)  
-- [ ] Emulator, device, atau Expo Go  
-- [ ] `npm start` / `npm run dev:android` jalan  
+- [ ] Emulator / device + **dev client atau debug APK** (face); Expo Go hanya untuk shell UI  
+- [ ] `npm run api:sync` → `npm start` / `npm run dev:android` jalan  
 
 ### Semua
 
@@ -371,6 +373,7 @@ Alur branch / PR: [Git Workflow](./git-workflow).
 | 0.1.0 | 2026-09-24 | Draft awal: Git, VS Code, Bun, Node, JDK, Android Studio; fokus Windows |
 | 0.2.0 | 2026-09-24 | Selaras repo: Bun=BE/docs, npm=web/mobile; RN+Expo (bukan Capacitor); `gh` untuk OpenAPI; CF Pages / APK CI |
 | 0.3.0 | 2026-09-24 | Living guide; Expo Go tidak cukup untuk face (dev client / APK wajib) |
+| 0.3.1 | 2026-09-26 | `api:sync` default mirror docs (tanpa `gh`); FCM di quick start BE; checklist web/mobile |
 
 ---
 
