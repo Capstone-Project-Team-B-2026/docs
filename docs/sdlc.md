@@ -12,9 +12,9 @@ title: Software Development Life Cycle (SDLC)
 | Field | Value |
 |-------|-------|
 | Product | Nexus Ops — Aplikasi Absensi Divisi Operation |
-| Version | 1.0.4 |
+| Version | 1.0.5 |
 | Tim | Kelompok B — Capstone Project 50 Team B 2026 |
-| Last updated | 2026-09-26 |
+| Last updated | 2026-09-28 |
 
 ---
 
@@ -164,16 +164,18 @@ Bugfix UAT Minggu 7–8; release + presentasi Minggu 8.
 
 ## 4. Jadwal & mapping fase ↔ sprint (1 minggu)
 
-| Sprint | Tanggal (dari) | Fase | Fokus | Artefak |
-|--------|----------------|------|-------|---------|
-| **S1** | 2026-09-22 | Analisis | Wawancara, requirement | PRD Locked + **retro foundation cards (Done)** |
-| **S2** | 2026-09-29 | Kickoff paralel | Auth/shell mobile + web; kontrak API; **Karil Bab I** | Login/home skeleton + outline naskah |
-| **S3** | 2026-10-06 | Build paralel | Attendance (face/GPS) + Approvals + notif feed UI; **Karil Bab II teori** | Clock-in + inbox + M-N01 |
-| **S4** | 2026-10-13 | Build paralel | Leave + Reports + riwayat UI + tim web; **Karil Bab II lit. review** | Leave + ekspor + history UI |
-| **S5** | 2026-10-20 | Build paralel | OT + HRD users + notif API; **Karil Bab III metode** | Lembur + kelola akun + FCM |
-| **S6** | 2026-10-27 | Build + integrasi | Geofence + face enroll + history API; **Karil instrumen Bab IV** | P1 lokasi & enrollment |
-| **S7** | 2026-11-03 | Polish + UAT start | P2 sisa + UAT; **Karil Bab IV draft** | UAT checklist berjalan |
-| **S8** | 2026-11-10 | UAT & Release | Deploy + **Karil Bab V + finalisasi naskah** + presentasi | Tag `v1.0.0` + karil PDF |
+Sprint board = **Senin → Minggu** (field Sprint di [Project #2](https://github.com/orgs/Capstone-Project-Team-B-2026/projects/2); `startDay` = Senin).
+
+| Sprint | Tanggal (dari · Senin) | Fase | Fokus | Artefak |
+|--------|------------------------|------|-------|---------|
+| **S1** | 2026-09-21 | Analisis | Wawancara, requirement | PRD Locked + **retro foundation cards (Done)** |
+| **S2** | 2026-09-28 | Kickoff paralel | Auth/shell mobile + web; kontrak API; **Karil Bab I** | Login/home skeleton + outline naskah |
+| **S3** | 2026-10-05 | Build paralel | Attendance (face/GPS) + Approvals + notif feed UI; **Karil Bab II teori** | Clock-in + inbox + M-N01 |
+| **S4** | 2026-10-12 | Build paralel | Leave + Reports + riwayat UI + tim web; **Karil Bab II lit. review** | Leave + ekspor + history UI |
+| **S5** | 2026-10-19 | Build paralel | OT + HRD users + notif API; **Karil Bab III metode** | Lembur + kelola akun + FCM |
+| **S6** | 2026-10-26 | Build + integrasi | Geofence + face enroll + history API; **Karil instrumen Bab IV** | P1 lokasi & enrollment |
+| **S7** | 2026-11-02 | Polish + UAT start | P2 sisa + UAT; **Karil Bab IV draft** | UAT checklist berjalan |
+| **S8** | 2026-11-09 | UAT & Release | Deploy + **Karil Bab V + finalisasi naskah** + presentasi | Tag `v1.0.0` + karil PDF |
 
 **Urutan jenis kerja:** **[Contract]** / **[UI]** → Backlog di awal sprint → **[Impl]** / **[API]** (Icebox sampai kontrak/UI siap) → **[Test]** (Icebox sampai UI + wire API siap; lalu Backlog / eksekusi).
 
@@ -184,17 +186,17 @@ gantt
   axisFormat  %d/%m
 
   section S1 Analisis
-  Wawancara & PRD                :a1, 2026-09-22, 7d
+  Wawancara & PRD                :a1, 2026-09-21, 7d
 
   section S2–S7 Parallel
-  Backend API                    :b1, 2026-09-29, 42d
-  Mobile UI / MVP                :m1, 2026-09-29, 42d
-  Web dashboard                  :w1, 2026-09-29, 42d
-  Karya ilmiah (Karil)           :k1, 2026-09-29, 49d
+  Backend API                    :b1, 2026-09-28, 42d
+  Mobile UI / MVP                :m1, 2026-09-28, 42d
+  Web dashboard                  :w1, 2026-09-28, 42d
+  Karya ilmiah (Karil)           :k1, 2026-09-28, 49d
 
   section S7–S8 Validasi
-  Integrasi & UAT                :t1, 2026-11-03, 14d
-  Release & karil final          :r1, 2026-11-10, 7d
+  Integrasi & UAT                :t1, 2026-11-02, 14d
+  Release & karil final          :r1, 2026-11-09, 7d
 ```
 
 ### 4.1 Karya ilmiah (karil) — lanjutan metopen
@@ -221,8 +223,8 @@ Naskah ilmiah capstone **melanjutkan bentuk metopen** UT (contoh struktur: Bab I
 
 | Event | Frekuensi | Tujuan |
 |-------|-----------|--------|
-| Sprint | **1 minggu** (S1…S8) | Increment; BE ∥ mobile ∥ web |
-| Sprint planning | Awal sprint | Ambil `sprint:@current` (bukan Icebox) |
+| Sprint | **1 minggu** (S1…S8), mulai **Senin** | Increment; BE ∥ mobile ∥ web |
+| Sprint planning | Awal sprint (Senin) | Ambil `sprint:@current` (bukan Icebox) |
 | Daily sync | Singkat | Blocking & handoff |
 | Sprint review | Akhir sprint | Demo |
 | Retro | Akhir sprint | Proses |
@@ -344,6 +346,7 @@ Risiko produk: [PRD §12](./prd).
 | 1.0.2 | 2026-09-25 | **Karil** paralel S2–S8 (Atin); mapping Bab I–V lanjutan metopen; card docs#12–#18 |
 | 1.0.3 | 2026-09-25 | S1 artefak: retro foundation cards (Done) di board — pekerjaan fondasi docs/backend/web/mobile |
 | 1.0.4 | 2026-09-26 | §3.4: indeks skenario utama integration BE + E2E web/mobile + rujukan UAT `[Test]` |
+| 1.0.5 | 2026-09-28 | Sprint board & jadwal §4: mulai **Senin** (S1 21 Sep … S8 9 Nov); selaras Project #2 |
 ---
 
 ## Referensi
