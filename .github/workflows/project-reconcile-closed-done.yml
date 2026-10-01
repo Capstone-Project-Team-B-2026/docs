@@ -1,0 +1,32 @@
+# Move closed issues / merged PRs on org project #2 → Status Done.
+# Complements built-in Project workflows (which can no-op after custom Status columns).
+#
+# Secret required: PROJECT_TOKEN — PAT with Organization Projects (read/write).
+name: Project reconcile closed → Done
+
+on:
+  schedule:
+    # Every 15 minutes — catch merge/close gaps quickly
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-reconcile-closed-done
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Move closed/merged items to Done
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+          PROJECT_NUMBER: '2'
+          ORG: Capstone-Project-Team-B-2026
+        run: bash .github/scripts/reconcile-closed-to-done.sh
