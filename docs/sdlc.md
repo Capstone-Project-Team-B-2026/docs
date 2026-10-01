@@ -63,7 +63,10 @@ Prinsip kerja:
 - **Paralel:** backend, mobile, web sejak S2.
 - Setiap sprint menghasilkan increment demoable.
 - Board: filter **This Sprint** = `sprint:@current -status:Icebox`.
-- **Otomasi:** [`project-sprint-backlog.yml`](https://github.com/Capstone-Project-Team-B-2026/docs/blob/main/.github/workflows/project-sprint-backlog.yml) mempromosikan **`[Contract]` / `[UI]`** yang sprint-nya sudah mulai: **Icebox → Backlog**, dan **menghapus label `Icebox`**. **`[Test]` tidak ikut promote** — tetap Icebox sampai UI + API/Impl slice terkait siap (pindah manual ke Backlog). Secret: `PROJECT_TOKEN`.
+- **Otomasi:**
+  - [`project-sprint-backlog.yml`](https://github.com/Capstone-Project-Team-B-2026/docs/blob/main/.github/workflows/project-sprint-backlog.yml) mempromosikan **`[Contract]` / `[UI]`** yang sprint-nya sudah mulai: **Icebox → Backlog**, dan **menghapus label `Icebox`**. **`[Test]` tidak ikut promote** — tetap Icebox sampai UI + API/Impl slice terkait siap (pindah manual ke Backlog).
+  - [`project-reconcile-closed-done.yml`](https://github.com/Capstone-Project-Team-B-2026/docs/blob/main/.github/workflows/project-reconcile-closed-done.yml) memindahkan issue **closed** / PR **merged** yang masih bukan **Done** → **Done** (safety net bila built-in Project workflow no-op setelah Status dikustomisasi).
+  - Secret: `PROJECT_TOKEN` (org Projects read/write).
 
 ---
 
